@@ -1,7 +1,18 @@
 //base
+const updateViewport = () => {
+  const boardElement = document.querySelector('.l-board');
+  boardElement.style.height = window.innerHeight + 'px';
+}
+
+window.addEventListener('resize', updateViewport);
+window.addEventListener('orientationchange', updateViewport);
+updateViewport;
+
 document.addEventListener('touchmove', (e) => {
   e.preventDefault();
 }, {passive: false})
+
+
 
 //zoom
 
