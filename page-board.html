@@ -16,10 +16,11 @@
   <!--css-->
   <link rel="stylesheet" href="css/style.css">
   <!--JavaScript-->
-  <script src="js/session--board.js" defer></script>
-  <script src="js/modal--board.js" defer></script>
-  <script src="js/canvas.js" defer></script>
-  <script src="js/canvas-mobile.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/board/session--board.js" defer></script>
+  <script src="js/board/modal--board.js" defer></script>
+  <script src="js/board/canvas.js" defer></script>
+  <script src="js/board/canvas--mobile.js" defer></script>
 </head>
 <body class="l-body">
   <div class="l-body__head--board"></div>
@@ -143,7 +144,7 @@
       <button class="c-button c-button__howToUse" id="open--howToUse">
         <p>How to use</p>
       </button>
-      <button class="c-button c-button__whatsSite--boardMenu" id="open--whatsSite1">
+      <button class="c-button c-button__whatsSite--boardMenu" id="open--whatsSiteBoard">
         <p>当サイトについて</p>
       </button>
     </nav>
@@ -1229,7 +1230,7 @@
         <img src="image/R6_Siege_X_Logo_JP.avif" alt="RainbowSixSiegeX__Link">
       </a>
     </div>
-    <button class="c-button c-button--whatsSite" id="open--whatsSite2">
+    <button class="c-button c-button--whatsSite" id="open--whatsSite">
       <p>当サイトについて</p>
     </button>
     <dialog class="c-modal c-modal--whatsSite js-whatsSite">

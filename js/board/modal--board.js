@@ -2,21 +2,18 @@
 /*menu*/
 const toggleWhatsSiteBoard = () => {
   const modal = document.querySelector('dialog.js-whatsSite');
-  const openButton1 = document.getElementById('open--whatsSite1');
-  const openButton2 = document.getElementById('open--whatsSite2');
+  const openButton = document.getElementById('open--whatsSiteBoard');
   const closeButton = document.getElementById('close--whatsSite');
 
-  openButton1.addEventListener('click', () => {
+  openButton.addEventListener('click', () => {
     modal.style.display = 'block';
     modal.showModal();
-  })
-  openButton2.addEventListener('click', () => {
-    modal.showModal();
-  })
+  });
+
   closeButton.addEventListener('click', () => {
     modal.close();
-  })
-}
+  });
+};
 
 const toggleSetting = () => {
   const modal = document.querySelector('dialog.js-setting');
