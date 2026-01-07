@@ -399,28 +399,41 @@ function deactivateGears() {
 };
 
 
-//TODO: strikerなどの仕様を追加する。
 function loadLegend() {
   Object.keys(selectedOperators).forEach(key => {
-
+    //operatorセット時、もしくはblank時の処理
     for(let i = 0; i < selectedOperators[key].length; i++) {
+      const operatorName = selectedOperators[key][i].operatorName;
+      const hasSelectedGadgets = selectedOperators[key][i].hasOwnProperty('selectedGadgets');
+      const selectedGadgets = selectedOperators[key][i].selectedGadgets;
+      const isStriker = operatorName === 'striker';
+      const isSentry  = operatorName === 'sentry';
+      const isBlank   = operatorName === 'blank';
       const operatorContainer = document.querySelector(`#js-legend__operator--${key}${i + 1}`);
       const icon = operatorContainer.lastElementChild.lastElementChild;
       const ability = operatorContainer.firstElementChild.children[3];
       const gadgetContainer = operatorContainer.firstElementChild.children[2];
       const gadgets = Array.from(gadgetContainer.children);
-
+      
       icon.setAttribute('src', selectedOperators[key][i].icon);
       icon.setAttribute('alt', 'operator_' + selectedOperators[key][i].operatorName);
 
-      ability.setAttribute('src', selectedOperators[key][i].ability.img);
-      ability.setAttribute('alt', 'ability_' + selectedOperators[key][i].ability.abilityName);
+      if(isStriker || isSentry) {
+        ability.style.display = `none`;
+      } else if (!isBlank) {
+        ability.style.display = 'block';
+        ability.setAttribute('src', selectedOperators[key][i].ability.img);
+        ability.setAttribute('alt', 'ability_' + selectedOperators[key][i].ability.abilityName);
+      }
 
-      if(selectedOperators[key][i].hasOwnProperty('selectedGadget')) {
-        gadgets[0].setAttribute('src', selectedOperators[key][i].selectedGadget.img);
-        gadgets[0].setAttribute('alt', 'selectedGadget_' + selectedOperators[key][i].selectedGadget.gadgetName);
+      if(hasSelectedGadgets && selectedGadgets.length > 0) {
+        for(let j = 0; j < selectedGadgets.length; j++) {
+          gadgets[j].removeAttribute('style');
+          gadgets[j].setAttribute('src', selectedGadgets[j].img);
+          gadgets[j].setAttribute('alt', 'selectedGadget_' + selectedGadgets[j].gadgetName);
+        }
 
-        for(let j = 1; j < gadgets.length; j++) {
+        for(let j = selectedGadgets.length; j < gadgets.length; j++) {
           gadgets[j].style.display = 'none';
         }
 
@@ -428,19 +441,42 @@ function loadLegend() {
         for(let j = 0; j < gadgets.length; j++) {
         const gadgetNumber = `gadget${j + 1}`;
         
-        const checkOperator = selectedOperators[key][i].operatorName === 'blank';
+        const isCheckOperatorBlank = selectedOperators[key][i].operatorName === 'blank';
+        const hasGadget = selectedOperators[key][i].hasOwnProperty([gadgetNumber]);
 
-        if (!selectedOperators[key][i].hasOwnProperty([gadgetNumber]) && checkOperator) {
-          gadgets[j].removeAttribute('style');
+
+        if (!hasGadget && isCheckOperatorBlank) {
+          gadgets[0].removeAttribute('style');
+
+          for(let k = 1; k < gadgets.length; k++) {
+            gadgets[k].style.display = 'none';
+          }
           continue;
-        } else if(!selectedOperators[key][i].hasOwnProperty([gadgetNumber]) && !checkOperator){
+        } else if(!hasGadget && !isCheckOperatorBlank){
           gadgets[j].style.display = 'none';
           continue;
+        }
+
+        if(!hasSelectedGadgets ||selectedGadgets.length === 0) {
+          gadgets[j].removeAttribute('style');
         }
 
         gadgets[j].setAttribute('src', selectedOperators[key][i][gadgetNumber].img);
         gadgets[j].setAttribute('alt', selectedOperators[key][i][gadgetNumber].gadgetName);
         }
+      }
+    }
+
+    //operator未選択の時の処理
+    for(let i = selectedOperators[key].length; i < 5; i++) {
+      const operatorContainer = document.querySelector(`#js-legend__operator--${key}${i + 1}`);
+      const gadgetContainer = operatorContainer.firstElementChild.children[2];
+      const gadgets = Array.from(gadgetContainer.children);
+
+      gadgets[0].removeAttribute('style');
+
+      for(let j = 1; j < gadgets.length; j++) {
+        gadgets[j].style.display = 'none';
       }
     }
   });
@@ -480,23 +516,29 @@ function toggleOperatorSetting() {
   });
 };
 
-function loadOperatorSetting() {
+function loadOperatorForOperatorSetting() {
   Object.keys(selectedOperators).forEach(key => {
-    
+
+    //operatorがselectedもしくはblankの場合
     for(let i = 0; i < selectedOperators[key].length; i++) {
+      const operatorData = selectedOperators[key][i];
+      const operatorName = operatorData.operatorName;
+      const isStriker = operatorName === 'striker';
+      const isSentry  = operatorName === 'sentry';
+      const isBlank   = operatorName === 'blank';
       const operatorContainer = document.getElementById(`js-operatorSetting${key}${i + 1}`);
       const playerName = operatorContainer.children[0];
-      const operatorIcon = operatorContainer.children[1];
-      const operatorAbility = operatorContainer.children[2];
-      const operatorGadgetContainers = {};
-      const operatorGadgets = {};
+      const icon = operatorContainer.children[1];
+      const ability = operatorContainer.children[2];
+      const maxGadgetContainerCount = 7;
+      const gadgetContainers = {};
+      const gadgets = {};
       
-      for(let j = 0; j < 3; j++) {
+      for(let j = 0; j < maxGadgetContainerCount; j++) {
         const containerKey = `operatorGadgetContainer${j + 1}`;
-        operatorGadgetContainers[containerKey] = operatorContainer.children[3].children[j];
+        gadgetContainers[containerKey] = operatorContainer.children[3].children[j];
         const gadgetKey =`gadget${j + 1}`;
-        operatorGadgets[gadgetKey] = operatorGadgetContainers[containerKey].firstElementChild;
-
+        gadgets[gadgetKey] = gadgetContainers[containerKey].firstElementChild;
       }
 
       if(selectedOperators[key][i].hasOwnProperty('playerName')) {
@@ -510,32 +552,68 @@ function loadOperatorSetting() {
         playerName.textContent = text.charAt(0).toUpperCase() + text.slice(1);
       }
 
-      operatorIcon.setAttribute('src', selectedOperators[key][i].icon);
-      operatorIcon.setAttribute('alt', 'operator_' + selectedOperators[key][i].operatorName);
-      operatorAbility.setAttribute('src', selectedOperators[key][i].ability.img);
-      operatorAbility.setAttribute('alt', 'ability_' + selectedOperators[key][i].ability.abilityName);
+      icon.setAttribute('src', selectedOperators[key][i].icon);
+      icon.setAttribute('alt', 'operator_' + selectedOperators[key][i].operatorName);
+    
+      if(isStriker || isSentry) {
+        ability.style.display = 'none';
+      } else {
+        ability.removeAttribute('style');
+        ability.setAttribute('src', selectedOperators[key][i].ability.img);
+        ability.setAttribute('alt', 'ability_' + selectedOperators[key][i].ability.abilityName);
+      }
+
+      loadGadgetsForOperatorSetting(operatorData, operatorContainer);
+    }
+    
+    //operatorがundefindの場合
+    for(let i = selectedOperators[key].length; i < 5; i++) {
+      const operatorContainer = document.getElementById(`js-operatorSetting${key}${i + 1}`);
+      const gadgetContainers = operatorContainer.lastElementChild.children;
 
       for(let j = 0; j < 3; j++) {
-        const gadgetKey = `gadget${j + 1}`;
-        const containerKey = `operatorGadgetContainer${j + 1}`;
-        if(selectedOperators[key][i].hasOwnProperty(gadgetKey)) {
-          const checkGadgetBlank = selectedOperators[key][i][gadgetKey].gadgetName === 'blank';
-          if(!checkGadgetBlank) {
-            operatorGadgetContainers[containerKey].classList.remove('blank');
-          }
-          
-          operatorGadgets[gadgetKey].setAttribute('src', selectedOperators[key][i][gadgetKey].img);
-          operatorGadgets[gadgetKey].setAttribute('alt', `gadget${j}` + selectedOperators[key][i][gadgetKey].gadgetName);
-        }
+        gadgetContainers[j].style.display = 'block';
+      }
+
+      for(let j = 3; j < gadgetContainers.length; j++) {
+        gadgetContainers[j].style.display = 'none';
       }
     }
   });
 };
 
-function selectGadget(e) {
+function loadGadgetsForOperatorSetting(operatorData, operatorContainer) {
+  const gadgetContainers = operatorContainer.lastElementChild.children;
+
+  for(let i = 0; i < gadgetContainers.length /*maxGadgetContainerCount*/; i++) {
+    const gadgetIcon = gadgetContainers[i].firstElementChild;
+    const gadgetKey = `gadget${i + 1}`;
+    const hasGadget = operatorData.hasOwnProperty(gadgetKey);
+
+    if(hasGadget) {
+      gadgetContainers[i].removeAttribute('style');
+      gadgetContainers[i].classList.remove('blank');
+      gadgetIcon.setAttribute('src', operatorData[gadgetKey].img);
+      gadgetIcon.setAttribute('alt',`gadget${i}` + operatorData[gadgetKey].gadgetName);
+      continue;
+    } else if (!hasGadget && i < 3) {
+      gadgetContainers[i].classList.add('blank');
+      continue;
+    } else {
+      gadgetContainers[i].style.display = 'none';
+    }
+  }
+};
+
+let strikerGadgetCounter = 0;
+let sentryGadgetCounter = 0;
+
+function selectGadgetForOperatorSetting (e) {
   const targetGadgetContainer = e.currentTarget;
   const targetGadget = targetGadgetContainer.firstElementChild;
   const parentGadgetContainer = targetGadgetContainer.parentNode;
+  const operatorIcon = parentGadgetContainer.previousElementSibling.previousElementSibling;
+  const operatorName = operatorIcon.getAttribute('alt').slice(9);
   const gadgetContainers = Array.from(parentGadgetContainer.children);
   const gadgets = [];
 
@@ -543,30 +621,98 @@ function selectGadget(e) {
     gadgets.push(gadgetContainer.firstElementChild);
   });
 
-  const checkBlank = targetGadgetContainer.classList.contains('blank');
+  const isCheckBlank = targetGadgetContainer.classList.contains('blank');
 
-  if(checkBlank) {
+  if(isCheckBlank) {
     return;
+  }
+
+  if(operatorName === 'striker') {
+    const hasClassSelected = targetGadget.classList.contains('js-selectedGadget');
+
+    if(!hasClassSelected && strikerGadgetCounter < 2 ) {
+      addSelectedGadget(targetGadget);
+      writeSelectedGadgetToSelectedOperators(operatorName, targetGadget);
+      strikerGadgetCounter++;
+      return;
+
+    } else if (hasClassSelected && strikerGadgetCounter <= 2){
+      removeSelectedGadget(targetGadget);
+      removeSelectedGadgetToSelectedOperators(operatorName, targetGadget);
+      strikerGadgetCounter--;
+      return;
+
+    } else {
+      return;
+    }
+  } else if (operatorName ==='sentry'){
+    const hasClassSelected = targetGadget.classList.contains('js-selectedGadget');
+
+    if(!hasClassSelected && sentryGadgetCounter < 2) {
+      addSelectedGadget(targetGadget);
+      writeSelectedGadgetToSelectedOperators(operatorName, targetGadget);
+      sentryGadgetCounter++;
+      return;
+
+    } else if(hasClassSelected && sentryGadgetCounter <= 2) {
+      removeSelectedGadget(targetGadget);
+      removeSelectedGadgetToSelectedOperators(operatorName, targetGadget);
+      sentryGadgetCounter--;
+      return;
+
+    } else {
+      return;
+    }
   } else {
     gadgets.forEach(gadget => {
       gadget.classList.remove('js-selectedGadget');
     });
     targetGadget.classList.add('js-selectedGadget');
-
-    const operatorIcon = parentGadgetContainer.previousElementSibling.previousElementSibling;
-    const operatorName = operatorIcon.getAttribute('alt').slice(9);
-
-    Object.keys(selectedOperators).forEach(key => {
-      selectedOperators[key].forEach(operator => {
-        if (operator.operatorName === operatorName) {
-          operator.selectedGadget = {};
-          operator.selectedGadget.img = targetGadget.getAttribute('src');
-          operator.selectedGadget.gadgetName = targetGadget.getAttribute('alt');
-        }
-      });
-    });
+    writeSelectedGadgetToSelectedOperators(operatorName, targetGadget);
   }
 };
+
+function addSelectedGadget(targetGadget) {
+  targetGadget.classList.add('js-selectedGadget');
+};
+
+function removeSelectedGadget(targetGadget) {
+  targetGadget.classList.remove('js-selectedGadget');
+};
+
+function writeSelectedGadgetToSelectedOperators(operatorName, targetGadget) {
+  Object.keys(selectedOperators).forEach(key => {
+
+    selectedOperators[key].forEach(selectedOperator => {
+      const isOperator = selectedOperator.operatorName === operatorName;
+
+      if(isOperator) {
+        currentGadget = {};
+        currentGadget.img = targetGadget.getAttribute('src');
+        currentGadget.gadgetName = targetGadget.getAttribute('alt');
+
+        selectedOperator.selectedGadgets.push(currentGadget);
+      }
+    });
+  });
+};
+
+function removeSelectedGadgetToSelectedOperators(operatorName, targetGadget) {
+  Object.keys(selectedOperators).forEach(key => {
+    selectedOperators[key].forEach(selectedOperator => { //HACK:findで書き直せるかも
+      const isOperator = selectedOperator.operatorName === operatorName;
+      const targetGadgetName = targetGadget.getAttribute('alt');
+      
+      if(isOperator) {
+        const selectedGadgets = selectedOperator.selectedGadgets;
+        const gadgetIndex = selectedGadgets.findIndex((selectedGadget) => selectedGadget.gadgetName === targetGadgetName);
+
+        selectedGadgets.splice(gadgetIndex, 1);
+      }
+    })
+  })
+}
+
 
 function initializeGadgetsInOperatorSetting(side, operatorNumber) {
   const operatorContainer = document.querySelector(`#js-operatorSetting${side}${operatorNumber}`);
@@ -641,18 +787,25 @@ function iconSettingRemoveSelectedIcon(e) {
 
   targetArray.icon = 'image/icon_operator/figure.png';
   targetArray.operatorName = 'blank';
+
+  targetArray.ability = {};
   targetArray.ability.img = 'image/icon_ability/ability__empty.png';
   targetArray.ability.abilityName = 'blank';
 
   for(let i = 1; i <= 3; i++) {
     const gadgetKey = `gadget${i}`;
 
-    if(!targetArray.hasOwnProperty(gadgetKey)){
-      continue;
-    }
+    if(targetArray.hasOwnProperty(gadgetKey)) {
+      targetArray[gadgetKey].img = 'image/icon_gadget/gadget__empty.png';
+      targetArray[gadgetKey].gadgetName = 'blank';
+    } 
+  }
 
-    targetArray[gadgetKey].img = 'image/icon_gadget/gadget__empty.png';
-    targetArray[gadgetKey].gadgetName = 'blank';
+  for(let i = 4; i < 8; i++) {
+    const gadgetKey = `gadget${i}`;
+    if(targetArray.hasOwnProperty(gadgetKey)) {
+      delete targetArray[gadgetKey];
+    }
   }
 
   initializeGadgetsInOperatorSetting(key, operatorNumber);
@@ -707,14 +860,24 @@ function loadIconSetttingSelectedIconsRight() {
 function initializeSelectedOperatorToArray(targetArrayOperator) {
   targetArrayOperator.icon = 'image/icon_operator/figure.png';
   targetArrayOperator.operatorName = 'blank';
+
+  targetArrayOperator.ability = {};
   targetArrayOperator.ability.img = 'image/icon_ability/ability__empty.png';
   targetArrayOperator.ability.abilityName = 'blank';
+
   for(let i = 1; i <= 3; i++ ) {
     const gadgetKey = `gadget${i}`;
 
     if(targetArrayOperator.hasOwnProperty(gadgetKey)) {
       targetArrayOperator[gadgetKey].img = 'image/icon_gadget/gadget__empty.png';
       targetArrayOperator[gadgetKey].gadgetName = 'blank';
+    }
+  }
+
+  for(let i = 4; i < 8; i++) {
+    const gadgetKey = `gadget${i}`;
+    if(targetArrayOperator.hasOwnProperty(gadgetKey)) {   
+      delete targetArrayOperator[gadgetKey];
     }
   }
 };
@@ -730,7 +893,7 @@ function removeIconSettingIcon(key, e) {
   initializeSelectedOperatorToArray(removedArrayOperator);
   loadIconSetting();
   initializeGadgetsInOperatorSetting(key, removedNumber);
-  loadOperatorSetting();
+  loadOperatorForOperatorSetting();
   loadLegend();
 };
 
@@ -753,6 +916,7 @@ function insertIconSettingIcon(key, e) {
     const clickedOperatorName = clickedIconContainer.lastElementChild.getAttribute('alt').slice(9);
     const operatorItem = operatorPool[key][clickedOperatorName];
     operatorItem.operatorName = clickedOperatorName;
+    operatorItem.selectedGadgets = [];
     const newOperator = JSON.parse(JSON.stringify(operatorItem));
     selectedOperators[key][arrayNumber] = newOperator;
 
@@ -848,7 +1012,7 @@ function loadSelectedFloorFromFloorSetting(e) {
 
   window.sessionStorage.setItem('selectedFloor', floor);
 
-  floors.forEach(floor => { //謎の変数指定がある。要修正。
+  floors.forEach(floor => {
     const floorContainer = document.getElementById(`js-floorSetting__floorList--${floor}`);
     isCheck = selectedMap.blueprint[`${floor}`] === '';
     
@@ -1041,7 +1205,7 @@ gearButton.addEventListener('click', () => {
 players.forEach(player => {
   player.addEventListener('input',(event) => {
     nameChange(event);
-    loadOperatorSetting();
+    loadOperatorForOperatorSetting();
     loadIconSetting();
   });
 });
@@ -1056,16 +1220,17 @@ operatorColorButtons.forEach(operatorColorButton => {
   });
 });
 
+
 operatorSettingGadgets.forEach(operatorSettingGadget => {
   operatorSettingGadget.addEventListener('click', (e) => {
-    selectGadget(e);
+    selectGadgetForOperatorSetting(e);
     loadLegend();
   });
 });
 
 
 /*********right*********/
-loadOperatorSetting();
+loadOperatorForOperatorSetting();
 
 toggleIconSettingATK();
 toggleIconSettingDEF();
@@ -1075,7 +1240,7 @@ iconSettingSelectedIconsLeft.forEach(selectedIcon => {
   selectedIcon.addEventListener('click', (e) => {
     iconSettingRemoveSelectedIcon(e);
     loadIconSetttingSelectedIconsRight();
-    loadOperatorSetting();
+    loadOperatorForOperatorSetting();
     loadLegend();
   });
 });
@@ -1093,11 +1258,11 @@ Object.keys(selectedOperators).forEach(key => {
 
       if(checkCounter) {
         removeIconSettingIcon(key, e);
-        loadOperatorSetting();
+        loadOperatorForOperatorSetting();
         loadLegend();
       } else {
         insertIconSettingIcon(key, e);
-        loadOperatorSetting();
+        loadOperatorForOperatorSetting();
         loadLegend();
       }
     });

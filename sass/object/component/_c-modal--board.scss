@@ -292,6 +292,9 @@
           p {
             width: 5vw;
             height: auto;
+            font-size: clamp(0.8em, 2vw, 2.5em);
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
           }
 
@@ -300,9 +303,19 @@
             height: auto;
             background-color: var(--white);
           }
+
+          img[alt=operator_striker] ~ .js-operatorSetting__gadgets {
+            width: 26vw;
+          }
+
+          img[alt=operator_sentry] ~ .js-operatorSetting__gadgets {
+            width: 26vw;
+          }
+
           .js-operatorSetting__gadgets {
+            width: 18vw;
             display: flex;
-            gap: 1vw;
+            justify-content: space-between;
 
             .blank {
               position: relative;

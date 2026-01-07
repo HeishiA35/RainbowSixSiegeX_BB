@@ -155,7 +155,6 @@ const operatorPool = {
             gadget5: smokeGranade,
             gadget6: stunGranade,
             gadget7: EMPImpactGranage
-
         },
 
         sledge: {
@@ -167,8 +166,8 @@ const operatorPool = {
         },
 
         thatcher: {
-            icon: 'image/icon_operator/attacker/Y0R6_BADGE_Thatcher_L.png',
-            ability: {img: 'image/icon_ability/attacker/thatcher_EMP_granade.png', abilityName: 'EMPGranade'},
+            icon: 'image/icon_operator/attacker/r6s-operators-badge-thatcher.avif',
+            ability: {img: 'image/icon_ability/attacker/thatcher_EGS_disruptor.png', abilityName: 'EGSDisruptor'},
             gadget1: breachCharge,
             gadget2: claymore
         },

@@ -82,8 +82,11 @@ Object.keys(selectedOperators).forEach(key => {
     const operatorName = operatorsFromSession[i];
     const operatorItems = operatorPool[key][operatorName];
     operatorItems.operatorName = operatorName;
+    operatorItems.selectedGadgets = []; //追加
 
     const newOperator = JSON.parse(JSON.stringify(operatorItems));
     selectedOperators[key].push(newOperator);
   }
 });
+
+console.log(selectedOperators);

@@ -1256,6 +1256,9 @@ z-index memo
 .c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator p {
   width: 5vw;
   height: auto;
+  font-size: clamp(0.8em, 2vw, 2.5em);
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: center;
 }
 .c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator img {
@@ -1263,9 +1266,16 @@ z-index memo
   height: auto;
   background-color: var(--white);
 }
+.c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator img[alt=operator_striker] ~ .js-operatorSetting__gadgets {
+  width: 26vw;
+}
+.c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator img[alt=operator_sentry] ~ .js-operatorSetting__gadgets {
+  width: 26vw;
+}
 .c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator .js-operatorSetting__gadgets {
+  width: 18vw;
   display: flex;
-  gap: 1vw;
+  justify-content: space-between;
 }
 .c-modal__operatorSetting .c-modal__operatorLists .c-modal__operatorList .c-modal__selectedOperator .js-operatorSetting__gadgets .blank {
   position: relative;
@@ -1642,29 +1652,6 @@ z-index memo
   width: 100%;
   height: 100%;
   position: relative;
-  /*
-      &--draw {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 132;
-      }
-
-      &--stamp {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 136;
-      }
-  */
 }
 .p-canvas__canvas--map {
   width: 100%;
@@ -1892,8 +1879,8 @@ z-index memo
   width: 100%;
 }
 .p-canvas__operator--items img {
-  width: 5vw;
-  max-width: 10vh;
+  width: 8vh;
+  max-width: 5vw;
 }
 .p-canvas__operator--items .playerName {
   width: 5vw;
