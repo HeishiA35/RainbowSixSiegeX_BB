@@ -14,6 +14,7 @@ let currentColor = '#ffffff';
 let currentPenColor = '#ffffff';
 let currentUserColor;
 let penBoldValue = 2;
+let eraserBoldValue = 8;
 
 const operatorButtons = document.querySelectorAll('.p-canvas__btn--operator');
 const colorPicker = document.querySelector('#js-penColor');
@@ -275,15 +276,15 @@ function activatePenBold(selectedBold, boldValue) {
   displayPenBold.style.height = boldValue;
 
   const selectedBoldElementChild = selectedBoldElement.children[0]
-  const checkBold2px = selectedBoldElementChild.classList.contains('c-modal__penBold--2px');
-  const checkBold4px = selectedBoldElementChild.classList.contains('c-modal__penBold--4px');
-  const checkBold8px = selectedBoldElementChild.classList.contains('c-modal__penBold--8px');
+  const isBold2px = selectedBoldElementChild.classList.contains('c-modal__penBold--2px');
+  const isBold4px = selectedBoldElementChild.classList.contains('c-modal__penBold--4px');
+  const isBold8px = selectedBoldElementChild.classList.contains('c-modal__penBold--8px');
 
-  if(checkBold2px) {
+  if(isBold2px) {
     penBoldValue = 2;
-  } else if(checkBold4px) {
+  } else if(isBold4px) {
     penBoldValue = 4;
-  } else if(checkBold8px) {
+  } else if(isBold8px) {
     penBoldValue = 8;
   }
 };
@@ -323,6 +324,19 @@ function activateEraserBold(selectedBold, boldValue) {
 
   selectedBoldElement.classList.add('js-eraserBoldSelected');
   displayEraserBold.style.height = boldValue;
+
+  const selectedBoldElementChild = selectedBoldElement.children[0];
+  const isBold2px = selectedBoldElementChild.classList.contains('c-modal__eraserBold--2px');
+  const isBold4px = selectedBoldElementChild.classList.contains('c-modal__eraserBold--4px');
+  const isBold8px = selectedBoldElementChild.classList.contains('c-modal__eraserBold--8px');
+
+  if(isBold2px) {
+    eraserBoldValue = 2;
+  } else if(isBold4px) {
+    eraserBoldValue = 4;
+  } else if(isBold8px) {
+    eraserBoldValue = 8;
+  }
 };
 
 /*********legend*********/
@@ -544,7 +558,7 @@ function loadOperatorForOperatorSetting() {
       if(selectedOperators[key][i].hasOwnProperty('playerName')) {
         playerName.textContent = selectedOperators[key][i].playerName;
 
-      } else if (selectedOperators[key][i].operatorName === 'blank') {
+      } else if (isBlank) {
         playerName.textContent = 'name';
 
       } else {
