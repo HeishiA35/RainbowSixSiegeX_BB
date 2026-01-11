@@ -78,14 +78,16 @@ Object.keys(selectedOperators).forEach(key => {
   const convertedArray = window.sessionStorage.getItem(`selectedOperator${key}s`);
   const operatorsFromSession = JSON.parse(convertedArray);
 
-  for(let i = 0; i < operatorsFromSession.length; i++) {
-    const operatorName = operatorsFromSession[i];
-    const operatorItems = operatorPool[key][operatorName];
-    operatorItems.operatorName = operatorName;
-    operatorItems.selectedGadgets = []; //追加
+  if(operatorsFromSession !== null) {
+    for(let i = 0; i < operatorsFromSession.length; i++) {
+      const operatorName = operatorsFromSession[i];
+      const operatorItems = operatorPool[key][operatorName];
+      operatorItems.operatorName = operatorName;
+      operatorItems.selectedGadgets = [];
 
-    const newOperator = JSON.parse(JSON.stringify(operatorItems));
-    selectedOperators[key].push(newOperator);
+      const newOperator = JSON.parse(JSON.stringify(operatorItems));
+      selectedOperators[key].push(newOperator);
+    }
   }
 });
 
