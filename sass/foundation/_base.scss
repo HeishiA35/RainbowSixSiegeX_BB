@@ -23,6 +23,9 @@ p {
 }
 
 body {
+  -webkit-user-select: none; // Safari用 
+  user-select: none;         // 標準
+
   &:has(dialog[open]) {
     overflow: hidden;
   }

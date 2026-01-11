@@ -126,6 +126,11 @@ p {
   word-break: keep-all;
 }
 
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+       user-select: none;
+}
 body:has(dialog[open]) {
   overflow: hidden;
 }
