@@ -21,6 +21,20 @@
     word-break: break-all;
   }
 
+  &__maintenance {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid red;
+    
+    p {
+      font-size: clamp(1em, 2.5vw, 4.5em);
+    }
+  }
+
   &__header {
     position: absolute;
     top: 2vh;

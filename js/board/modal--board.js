@@ -1073,16 +1073,18 @@ window.addEventListener('load', () => {
   toggleSetting();
   toggleHowToUse();
   activateMove();
-  setMapStatusPosition();
-  setLegendPosition();
+  //setMapStatusPosition(); //メンテナンス中はここをコメントアウト
+  //setLegendPosition(); //メンテナンス中はここをコメントアウト
 });
 
 window.addEventListener('resize', () => {
-  setMapStatusPosition();
-  setLegendPosition();
+  //setMapStatusPosition(); //メンテナンス中はここをコメントアウト
+  //setLegendPosition(); //メンテナンス中はここをコメントアウト
   locateCanvasExplanation();
 });
 
+/*howToUse*/ //メンテナンス中はここをコメントアウト
+/*
 buttonPageForward.addEventListener('click', () => {
   forwardHowToUsePage();
 
@@ -1122,7 +1124,7 @@ buttonPageBack.addEventListener('click', () => {
 });
 
 toggleWhatsSiteBoard();
-
+*/
 buttonMove.addEventListener('click', () => {
   deactivateTools();
   deactivateOperator();
