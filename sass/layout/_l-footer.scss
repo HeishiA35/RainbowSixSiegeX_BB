@@ -20,9 +20,6 @@
     flex-direction: column;
     align-items: center;
 
-    
-    
-
     @include responsive(tab) {
       display: none;
     }

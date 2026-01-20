@@ -1,5 +1,3 @@
-//howtouseの修正。もしくはcomingsoonに。
-
 let canvasContainerWidth = canvasContainer.clientWidth;
 let canvasContainerHeight = canvasContainer.clientHeight;
 

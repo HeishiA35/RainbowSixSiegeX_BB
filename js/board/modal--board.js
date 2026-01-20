@@ -74,6 +74,23 @@ function toggleSetting() {
 };
 
 /*********HowToUse*********/
+const VISITED_KEY = 'canvas_app_visited';
+
+function checkFirstVisit() {
+  const hasVisited = localStorage.getItem(VISITED_KEY);
+  const howToUse = document.getElementById('js-howToUse');
+
+  if(!hasVisited) {
+    const activePage = document.querySelector('.pageContent--active');
+    const currentPageNumber = Number(activePage.getAttribute('id').slice(17));
+    howToUse.classList.add('p-howToUse--active');
+    switchInformation(currentPageNumber);
+    localStorage.setItem(VISITED_KEY, 'true');
+  } else {
+    console.log('２回目以降のアクセス');
+  }
+};
+
 function toggleHowToUse() {
   const howToUse = document.getElementById('js-howToUse');
   const menu = document.querySelector('nav.js-board__menu');
@@ -81,8 +98,11 @@ function toggleHowToUse() {
   const closeButton = document.getElementById('close--howToUse');
 
   openButton.addEventListener('click', () => {
+    const activePage = document.querySelector('.pageContent--active');
+    const currentPageNumber = Number(activePage.getAttribute('id').slice(17));
     menu.classList.remove('l-body__menu--active');
     howToUse.classList.add('p-howToUse--active');
+    switchInformation(currentPageNumber);
   });
 
   closeButton.addEventListener('click', () => {
@@ -90,6 +110,39 @@ function toggleHowToUse() {
     deactivateItems();
     deactivateOperator();
   })
+};
+
+function switchInformation(currentPageNumber) {
+  switch (currentPageNumber) {
+    case 1: //leftの説明
+      console.log(1);
+      deactivateItems();
+      deactivateOperator();
+      setMapStatusPosition();
+      setLegendPosition();
+      locateHowToUseExplanationPage1();
+      break;
+    case 2: //rightの説明
+      console.log(2);
+      deactivateItems();
+      deactivateOperator();
+      locateHowToUseExplanationPage2();
+      break;
+    case 3: //canvasの説明
+      console.log(3);
+      deactivateItems();
+      deactivateOperator();
+      locateHowToUseExplanationPage3();
+      break;
+    case 4: //オペレータボタンの説明
+      console.log(4);
+      const operator = document.querySelector('.p-canvas__operator');
+      const items = document.querySelector('.p-canvas__operator--items');
+      operator.classList.add('p-canvas__operator--active');
+      items.classList.add('items--active');
+      locateHowToUseExplanationPage4();
+      break;
+  }
 };
 
 function forwardHowToUsePage() {
@@ -159,41 +212,104 @@ function setLegendPosition() {
   howToUseLegend.style.height = heightValue + 'px';
 };
 
-function locateCanvasExplanation() {
-  const zoomExplanation = document.querySelector('.p-howToUse__canvas--zoom');
-  const colorExplanation = document.querySelector('.p-howToUse__canvas--draw');
-  const nameExplanation = document.querySelector('.p-howToUse__canvas--name');
-  const stampExplanation = document.querySelector('.p-howToUse__canvas--stamp');
-  const operatorExplanation = document.querySelector('.p-howToUse__canvas--control');
+function getPositionOfExplanation(configs) {
+  configs.forEach(({ explanation, target, column, row}) => {
+    const explanationElement = document.querySelector(explanation);
+    const targetElement = typeof target === 'string' ?
+      document.querySelector(target) : target;
+  
+    if(!explanationElement || !targetElement) return;
 
-  const zoomElement = document.querySelector('.p-canvas__btn--zooms');
-  const operatorForExample = document.querySelector('.p-canvas__operator');
-  const colorElement = operatorForExample.firstElementChild.children[0];
-  const nameElement = operatorForExample.firstElementChild.children[1];
-  const stampElement = operatorForExample.firstElementChild.children[2];
-  const operatorElement = operatorForExample.lastElementChild;
-
-  const zoomPosition = zoomElement.getBoundingClientRect();
-  const colorPosition = colorElement.getBoundingClientRect();
-  const namePosition = nameElement.getBoundingClientRect();
-  const stampPosition = stampElement.getBoundingClientRect();
-  const operatorPosition = operatorElement.getBoundingClientRect();
-
-  zoomExplanation.style.top = zoomPosition.y + 'px';
-  zoomExplanation.style.left = zoomPosition.right + 'px';
-
-  colorExplanation.style.top = colorPosition.y + 'px';
-  colorExplanation.style.left = colorPosition.right + 'px';
-
-  nameExplanation.style.top = namePosition.y + 'px';
-  nameExplanation.style.left = namePosition.right + 'px';
-
-  stampExplanation.style.top = stampPosition.y + (stampPosition.bottom - stampPosition.y) / 2 + 'px';
-  stampExplanation.style.left = stampPosition.right + 'px';
-
-  operatorExplanation.style.top = operatorPosition.y + 'px';
-  operatorExplanation.style.left = operatorPosition.right + 'px';
+    const explanationRect = explanationElement.getBoundingClientRect();
+    const targetRect = targetElement.getBoundingClientRect();
+    
+    switch (column) {
+      case 'right':
+        explanationElement.style.left = `${targetRect.right}px`;
+        break;
+      case 'left':
+        explanationElement.style.right = `${window.innerWidth - targetRect.left}px`;
+        break;
+      }
+      
+    switch(row) {
+      case 'top':
+        explanationElement.style.top = `${targetRect.top}px`;
+        break;
+      case 'center':
+        const rowCenter = (targetRect.top + targetRect.height / 2) - (explanationRect.height / 2);
+        explanationElement.style.top = `${rowCenter}px`;
+        break;
+      case 'bottom':
+        const rowBottom = window.innerHeight - targetRect.bottom;
+        explanationElement.style.bottom = `${rowBottom}px` 
+    }
+  });
 };
+
+function locateHowToUseExplanationPage1() {
+  const configs = [
+    {explanation: '.p-howToUse__left--menu',    target: '#open--boardMenu', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__left--move',    target: '#js-buttonMove', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__left--draw',    target: '#open--penSetting', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__left--erase',   target: '#open--eraserSetting', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__left--legend',  target: '#js-buttonLegend', 
+      column:'right', row: 'center'}
+    ];
+        
+  getPositionOfExplanation(configs);
+}
+
+function locateHowToUseExplanationPage2() {
+  const configs = [
+    {explanation: '.p-howToUse__right--operators',  target: '#open--operatorSetting', 
+      column:'left', row: 'center'},
+    {explanation: '.p-howToUse__right--stamps',     target: '#open--stampSetting', 
+      column:'left', row: 'center'},
+    {explanation: '.p-howToUse__right--maps',       target: '#open--mapSetting', 
+      column:'left', row: 'center'},
+    {explanation: '.p-howToUse__right--floors',     target: '#open--floorSetting', 
+      column:'left', row: 'center'}
+  ];
+
+  getPositionOfExplanation(configs);
+}
+
+function locateHowToUseExplanationPage3() {
+  const configs = [
+    {explanation: '.p-howToUse__canvas--history',         target: '.p-canvas__history', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__canvas--zoom',            target: '.p-canvas__btn--zooms', 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__canvas--operatorButton',  target: '#js-legend__operator--ATK1', 
+      column:'right', row: 'bottom'}
+  ];
+
+  getPositionOfExplanation(configs);
+}
+
+function locateHowToUseExplanationPage4() {
+  const operatorInLegend =  document.querySelector('#js-legend__operator--ATK1');
+  const operatorItems = operatorInLegend.firstElementChild.children;
+  const operatorStamp = operatorInLegend.lastElementChild;
+  
+  const configs = [
+    {explanation: '.p-howToUse__canvas--draw',          target: operatorItems[0], 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__canvas--name',          target: operatorItems[1],
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__canvas--stamp',         target: operatorItems[2], 
+      column:'right', row: 'center'},
+    {explanation: '.p-howToUse__canvas--stampOperator', target: operatorStamp, 
+      column:'right', row: 'center'}
+  ];
+
+  getPositionOfExplanation(configs);
+}
 
 /*********whatsSite*********/
 function toggleWhatsSiteBoard() {
@@ -202,11 +318,13 @@ function toggleWhatsSiteBoard() {
   const closeButton = document.getElementById('close--whatsSite');
 
   openButton.addEventListener('click', () => {
+    modal.parentNode.style.display = 'block';
     modal.style.display = 'block';
     modal.showModal();
   });
 
   closeButton.addEventListener('click', () => {
+    modal.parentNode.style.display = 'none';
     modal.removeAttribute('style');
     modal.close();
   });
@@ -354,7 +472,7 @@ function activateEraserBold(selectedBold, boldValue) {
 function toggleLegend() {
   const legend = document.querySelector('.p-canvas__legend');
   const mapStatus = document.querySelector('.p-canvas__mapStatus');
-  const legendButton = document.getElementById('buttonLegend');
+  const legendButton = document.getElementById('js-buttonLegend');
 
   legendButton.addEventListener('click', () => {
     legend.classList.toggle('p-canvas__legend--active');
@@ -1073,58 +1191,36 @@ window.addEventListener('load', () => {
   toggleSetting();
   toggleHowToUse();
   activateMove();
-  //setMapStatusPosition(); //メンテナンス中はここをコメントアウト
-  //setLegendPosition(); //メンテナンス中はここをコメントアウト
+  setMapStatusPosition(); //メンテナンス中はここをコメントアウト
+  setLegendPosition(); //メンテナンス中はここをコメントアウト
+  checkFirstVisit();
 });
 
 window.addEventListener('resize', () => {
-  //setMapStatusPosition(); //メンテナンス中はここをコメントアウト
-  //setLegendPosition(); //メンテナンス中はここをコメントアウト
-  locateCanvasExplanation();
+  setMapStatusPosition(); //メンテナンス中はここをコメントアウト
+  setLegendPosition(); //メンテナンス中はここをコメントアウト
 });
 
 /*howToUse*/ //メンテナンス中はここをコメントアウト
-/*
+
 buttonPageForward.addEventListener('click', () => {
   forwardHowToUsePage();
 
   const activePage = document.querySelector('.pageContent--active');
-  const canvasPageNumber = 3;
-  const isCheckCanvasPage = Number(activePage.getAttribute('id').slice(17)) === canvasPageNumber;
-
-  if(isCheckCanvasPage) {
-    const operator = document.querySelector('.p-canvas__operator');
-    const items = document.querySelector('.p-canvas__operator--items');
-    operator.classList.add('p-canvas__operator--active');
-    items.classList.add('items--active');
-    locateCanvasExplanation();
-  } else {
-    deactivateItems();
-    deactivateOperator();
-  }
+  const currentPageNumber = Number(activePage.getAttribute('id').slice(17));
+  switchInformation(currentPageNumber);
 });
 
 buttonPageBack.addEventListener('click', () => {
   backHowToUsePage();
 
   const activePage = document.querySelector('.pageContent--active');
-  const canvasPageNumber = 3;
-  const isCheckCanvasPage = Number(activePage.getAttribute('id').slice(17)) === canvasPageNumber;
-
-  if(isCheckCanvasPage) {
-    const operator = document.querySelector('.p-canvas__operator');
-    const items = document.querySelector('.p-canvas__operator--items');
-    operator.classList.add('p-canvas__operator--active');
-    items.classList.add('items--active');
-    locateCanvasExplanation();
-  } else {
-    deactivateItems();
-    deactivateOperator();
-  }
+  const currentPageNumber = Number(activePage.getAttribute('id').slice(17));
+  switchInformation(currentPageNumber);
 });
 
 toggleWhatsSiteBoard();
-*/
+
 buttonMove.addEventListener('click', () => {
   deactivateTools();
   deactivateOperator();
