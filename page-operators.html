@@ -16,8 +16,10 @@
   <!--css-->
   <link rel="stylesheet" href="css/style.css">
   <!--JavaScript-->
-  <script src="js/modal.js" defer></script>
-  <script src="js/session--operators.js" defer></script>
+  <script src="js/constants.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/operators/modal--operators.js" defer></script>
+  <script src="js/operators/session--operators.js" defer></script>
 </head>
 <body class="l-body">
   <div class="l-body__head--operators"></div>
@@ -36,9 +38,9 @@
         </div>
       </button>
     </div>
-    <div class="l-body__instructions">
-      <p class="l-body__instruction--en">Select operators.</p>
-      <p class="l-body__instruction--ja c-text--jaToEn">オペレータを選べ。</p>
+    <div class="l-body__instructions l-body__instructions--nobtn">
+      <p>Select operators.</p>
+      <p class="c-text--jaToEn">オペレータを選べ。</p>
     </div>
     <div class="l-body__operators l-body__indicatingLine--1">
       <button class="c-operator__content" id="open--operatorsATK">
@@ -79,7 +81,7 @@
                 <img src="image/icon_operator/attacker/Y0R6_BADGE_Sledge_L.png" alt="operator_sledge">
               </div>
               <div class="c-operator__icon--modal js-operatorATK">
-                <img src="image/icon_operator/attacker/Y0R6_BADGE_Thatcher_L.png" alt="operator_thatcher">
+                <img src="image/icon_operator/attacker/r6s-operators-badge-thatcher.avif" alt="operator_thatcher">
               </div>
               <div class="c-operator__icon--modal js-operatorATK">
                 <img src="image/icon_operator/attacker/Y0R6_BADGE_Ash_L.png" alt="operator_ash">
@@ -341,15 +343,15 @@
       </dialog>
     </div>
     <div class="l-body__instructions l-body__indicatingLine--2 u-layout--pb10vh">
-      <button class="c-button" id="js-startBriefing">
-        <p class="l-body__instruction--en">Start Briefing.</p>
-        <p class="l-body__instruction--ja c-text--jaToEn">ブリーフィングを始める。</p>
+      <button class="c-button c-button__instructions" id="js-startBriefing">
+        <p>Start Briefing.</p>
+        <p class="c-text--jaToEn">ブリーフィングを始める。</p>
       </button>
     </div>
   </div>
   <footer class="l-footer">
     <div class="c-link">
-      <a href="#" class="c-link__logo">
+      <a href="https://www.ubisoft.com/ja-jp/game/rainbow-six/siege" class="c-button c-link__logo">
         <img src="image/R6_Siege_X_Logo_JP.avif" alt="RainbowSixSiegeX__Link">
       </a>
     </div>

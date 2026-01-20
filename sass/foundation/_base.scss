@@ -13,7 +13,23 @@
   size-adjust: 100%;
 }
 
-//これが適用されていない。
+html {
+  background-color: var(--background--dark);
+
+  &:has(dialog[open]) {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
+
+.base__body--canvas {
+  -webkit-touch-callout: no ne;
+
+  img {
+    touch-action: none;
+    -webkit-touch-callout: none;
+  }
+}
 
 p {
   color: var(--white);
@@ -22,12 +38,6 @@ p {
   letter-spacing: 0.1em;
   font-size: clamp(1.2em, 2.5vw, 2.5em);
   word-break: keep-all;
-}
-
-body {
-  &:has(dialog[open]) {
-    overflow: hidden;
-  }
 }
 
 dialog {

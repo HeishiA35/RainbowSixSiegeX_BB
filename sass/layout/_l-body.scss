@@ -1,7 +1,9 @@
 @use '../foundation' as *;
 
 .l-body {
-  width: 100%;
+  padding-top: 2dvh;
+  width: 100dvw;
+  height: 100dvh;
   position: relative;
 
   &__head {
@@ -78,20 +80,19 @@
     }
 
     .l-body__instructions {
+      margin: 0 auto;
       padding-top: calc(1rem + 5vw);
+      width: 50%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
-      transform: rotate(-2deg);
 
-      &--en {
-        font-size: 1.5em;
-      }
-
-      &--ja {
-        font-size: 0.8em;
+      &--nobtn {
+        opacity: 0.6;
+        pointer-events: none;
+        transform: rotate(-2deg);
       }
     }
 
@@ -105,32 +106,56 @@
       align-items: center;
       gap: 1rem;
 
+      @include responsive(tab) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      @include responsive(pc) {
+        grid-template-columns: repeat(6, 1fr);
+      }
+
       &--selected {
         margin: 0 auto;
         width: 60%;
         position: relative;
 
+        @include responsive(pc) {
+          max-width: 20%;
+        }
+
         &:after {
           content:'';
-          width: 50vw;
-          height: 5vw;
-          background: top right / contain no-repeat url(../image/materials/line--red.svg);
+          width: 12%;
+          height: 5%;
+          background: right / contain no-repeat url(../image/materials/line--red.svg);
           position: absolute;
-          top: calc(-1rem + 8vw);
-          left: calc(22vw * -1);
+          left: 44%;
+          bottom: -10%;
           z-index: 14;
           transform: rotate(-80deg);
-          transform-origin: top right;
+
+          @include responsive(pc) {
+            width: 20%;
+            left: 40%;
+            bottom: -15%;
+          }
         }
       }
     }
 
     .l-body__operators {
+      margin: 0 auto;
+      padding: 0 20%;
+      width: 90vw;
       padding-top: 2rem;
       display: flex;
       justify-content: center;
       gap: 4vw;
       position: relative;
+
+      @include responsive(pc) {
+        padding: 0;
+      }
     }
     
     .l-body__indicatingLine {
@@ -228,9 +253,9 @@
   }
 
   &__menu {
-    padding: 15vh 0;
-    width: 30vw;
-    height: 100vh;
+    padding: 10dvh 0 5dvh 0;
+    width: 30dvw;
+    height: 100%;
     background-color: black;
     display: none;
     flex-direction: column;
@@ -240,6 +265,10 @@
     top: 0;
     left: 0;
     z-index: 512;
+
+    img {
+      width: 70%;
+    }
 
     &--active {
       display: flex;

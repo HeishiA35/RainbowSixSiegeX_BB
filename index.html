@@ -16,17 +16,18 @@
   <!--css-->
   <link rel="stylesheet" href="css/style.css">
   <!--JavaScript-->
-  <script src="js/modal.js" defer></script>
-  <script src="js/session--index.js" defer></script>
+  <script src="js/constants.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/index/session--index.js" defer></script>
 </head>
 <body class="l-body">
   <div class="l-body__head--index">
   </div>
   <div class="l-body__body">
     <img src="image/logo--large.svg" alt="R6SXBriefingBoard ロゴ" class="l-body__logo">
-    <div class="l-body__instructions">
-      <p class="l-body__instruction--en">Select a map.</p>
-      <p class="l-body__instruction--ja c-text--jaToEn">マップを選べ。</p>
+    <div class="l-body__instructions l-body__instructions--nobtn">
+      <p>Select a map.</p>
+      <p class="c-text--jaToEn">マップを選べ。</p>
     </div>
     <div class="l-body__maps">
       <button class="c-map">
@@ -95,6 +96,7 @@
           <p>Consulate</p>
         </div>
       </button>
+      <!--
       <button class="c-map">
         <div class="c-map__shadow">
           <div class="c-map__shadow--object"></div>
@@ -104,6 +106,18 @@
         </div>
         <div class="c-map__active">
           <p>Emeraldplains</p>
+        </div>
+      </button>
+      -->
+      <button class="c-map">
+        <div class="c-map__shadow">
+          <div class="c-map__shadow--object"></div>
+        </div>
+        <div class="c-map__frame">
+          <img src="image/maps/r6-maps-fortress-blueprints/fortress-reworked-thumbnail.avif" alt="Fortress" class="c-map__img">
+        </div>
+        <div class="c-map__active">
+          <p>Fortress</p>
         </div>
       </button>
       <button class="c-map">
@@ -209,9 +223,9 @@
   </div>
   <footer class="l-footer">
     <div class="c-link">
-      <button class="c-link__logo">
+      <a href="https://www.ubisoft.com/ja-jp/game/rainbow-six/siege" class="c-button c-link__logo">
         <img src="image/R6_Siege_X_Logo_JP.avif" alt="RainbowSixSiegeX__Link">
-      </button>
+      </a>
     </div>
     <button class="c-button c-button__whatsSite--footer" id="open--whatsSite">
       <p>当サイトについて</p>
@@ -225,7 +239,7 @@
             <img src="image/materials/menu__close--black.svg">
           </button>
         </div>
-        <div class="c-modal__container--whatsSite">
+        <div class="c-modal__container c-modal__container--whatsSite">
           <p class="u-font--ja">
             　当サイトは<span class="u-font--en">RainbowSixSiegeX</span>を応援する非公式ファンサイトです。<br>
             　Ubisoft様、並びに<span class="u-font--en">RainbowSixSiegeX</span>の制作・運営に携わる企業・団体とは一切関係ありません。<br>

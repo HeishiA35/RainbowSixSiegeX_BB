@@ -4,28 +4,33 @@
   display: none;
 
   @include responsive(tab) {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: var(--background--dark);
     display: grid;
     grid-template-columns: 1fr 7fr 1fr;
     justify-items: center;
     align-items: center;
     gap: 3vw;
+    -webkit-user-select: none; // Safari用 
+    user-select: none;         // 標準
+    touch-action: none;
 
     &__sidebar {
       width: 100%;
-      height: 90vh;
+      height: 90dvh;
       display:flex;
       flex-direction: column;
       justify-content: space-around;
 
       &--left {
+        padding-left: 5dvw;
         align-items: end;
         position: relative;
       }
 
       &--right {
+        padding-right: 5dvw;
         align-items: start;
         position: relative;
       }
@@ -33,7 +38,7 @@
 
     &__main {
       width: 100%;
-      height: 90vh;
+      height: 90dvh;
       box-sizing: content-box;
       border: 0.5rem solid var(--white);
       position: relative;
