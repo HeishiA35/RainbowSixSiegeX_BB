@@ -11,12 +11,13 @@ const eraserBoldSetting = document.querySelectorAll('.js-eraserBold');
 let currentColor = '#ffffff';
 let currentPenColor = '#ffffff';
 let currentUserColor;
+let currentOpacity = 1.0;
 let penBoldValue = 2;
 let eraserBoldValue = 8;
 
 const operatorButtons = document.querySelectorAll('.p-canvas__btn--operator');
 const colorPicker = document.querySelector('#js-penColor');
-const transparencySlider = document.querySelector('#penTransparency');
+const opacitySlider = document.querySelector('#js-opacity');
 
 let moveMode;
 let drawMode;
@@ -434,22 +435,32 @@ function changeColorFromModal(color) {
   const colorValue = color.target.value;
 
   displayColor.style.backgroundColor = colorValue;
+  console.log(colorValue);
   currentPenColor = colorValue;
 };
 
-function toggleTransparency() {
-  const element = document.querySelector('.c-modal__transparency');
-  const toggleSwitch = document.querySelector('.c-modal__penSetting--transparency');
-
+function toggleOpacity() {
+  const element = document.querySelector('.c-modal__opacity');
+  const toggleSwitch = document.querySelector('.c-modal__penSetting--opacity');
+  
   toggleSwitch.addEventListener('click', () => {
-    element.classList.toggle('js-transparencyOpened');
+    const isOpened = element.classList.contains('js-opacityOpened');
+
+    if(!isOpened) {
+      element.classList.add('js-opacityOpened');
+    } else {
+      element.classList.remove('js-opacityOpened');
+    }
   });
 };
 
-function changeTransparency(transparency) {
-  const displayTransparency = document.querySelector('#js-displayTransparency');
+function changeOpacity(opacityStr) {
+  const displayOpacity = document.querySelector('#js-displayOpacity');
+  const opacityNum = Number(opacityStr);
+  const opacity = opacityNum / 100;
 
-  displayTransparency.textContent = `${transparency}%` ;
+  displayOpacity.textContent = `${opacityStr}%`;
+  currentOpacity = opacity;
 };
 
 function deactivateEraserBold() {
@@ -1144,6 +1155,7 @@ function loadSelectedMapObjFromMapSetting(e) {
   const map = {
     blueprint: {}
   };
+
   map.mapName = mapName;
   map.img = mapPool[mapName].img;
   map.blueprint.basement2nd = mapPool[mapName].basement2nd ? mapPool[mapName].basement2nd : '';
@@ -1270,14 +1282,15 @@ penBoldSetting.forEach(boldButton => {
 
 colorPicker.addEventListener('input', (event) => {
   changeColorFromModal(event);
+  currentColor = currentPenColor;
 });
 
-toggleTransparency();
+toggleOpacity();
 
-transparencySlider.addEventListener('change', (event) => {
-  const transparency = transparencySlider.value;
+opacitySlider.addEventListener('change', () => {
+  const opacityStr = opacitySlider.value;
   
-  changeTransparency(transparency);
+  changeOpacity(opacityStr);
 });
 
 eraserBoldSetting.forEach(boldButton => {
