@@ -439,6 +439,7 @@ function updateCanvas() {//cache上の情報と線を、ブラウザに描写。
     context.beginPath();
     context.lineJoin = "round";
     context.lineWidth = penBoldValue;
+    console.log(currentColor);
     context.strokeStyle = currentColor;
     context.globalAlpha = currentOpacity;
 

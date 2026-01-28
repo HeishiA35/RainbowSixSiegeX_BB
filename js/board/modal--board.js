@@ -435,6 +435,7 @@ function changeColorFromModal(color) {
   const colorValue = color.target.value;
 
   displayColor.style.backgroundColor = colorValue;
+  console.log(colorValue);
   currentPenColor = colorValue;
 };
 
@@ -1281,6 +1282,7 @@ penBoldSetting.forEach(boldButton => {
 
 colorPicker.addEventListener('input', (event) => {
   changeColorFromModal(event);
+  currentColor = currentPenColor;
 });
 
 toggleOpacity();
