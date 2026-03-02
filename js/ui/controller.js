@@ -271,9 +271,9 @@ export function deactivateGears() {
 /*****canvas*****/
 export function updateStaticCanvasCache(CANVAS_DATA) {
   const {selectedData, context, setting, state, drawnContents} = CANVAS_DATA;
-  const {container, cache, mapImage} = context;
+  const {cache, mapImage} = context;
 
-  cache.ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+  cache.ctx.clearRect(0, 0, cache.el.width, cache.el.height);
 
   const destX = state.translate.vX;
   const destY = state.translate.vY;

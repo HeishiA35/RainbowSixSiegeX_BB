@@ -25,6 +25,7 @@ import {
   setActivePointer,
   DRAW_STATE,
   TOUCH_STATE,
+  changeMapImageType,
 } from "../logic/switcher.js";
 
 import {
@@ -41,6 +42,7 @@ import {
 } from "../logic/calculator.js";
 
 import {
+  getMapDataFromPool,
   getOperatorDataFromPool,
 } from "../logic/factory.js";
 
@@ -168,6 +170,18 @@ export function handleHowToUseButtonClick(buttonId) {
   const activePageData = activePage.dataset.howToUse;
   switchInformation(activePageData);
   initHowToUsePositions();
+}
+
+/*****setting*****/
+export function handleMapImageSettingChange(e) {
+  const selectedMapImageType = e.target.value;
+
+  changeMapImageType(CANVAS_DATA, selectedMapImageType);
+  const newMapData = getMapDataFromPool(CANVAS_DATA.selectedData.map.mapName);
+  CANVAS_DATA.selectedData.map = newMapData;
+  loadMapImage(CANVAS_DATA);
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
 }
 
 /****Left*****/

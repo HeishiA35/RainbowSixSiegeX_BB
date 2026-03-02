@@ -6,6 +6,7 @@ import {
   OPERATOR_POOL,
   SELECTED_OPERATORS,
 } from "../data/operator_pool.js";
+import { CANVAS_DATA } from "../ui/canvasManager.js";
 
 import {
   getStampPositionsToFollowMouse,
@@ -58,14 +59,22 @@ export function getMapDataFromPool(mapName) {
     blueprint: {}
   };
 
+  const mapType = CANVAS_DATA.selectedData.mapType;
+
   map.mapName               = mapName;
   map.img                   = MAP_POOL[mapName].img;
-  map.blueprint.basement2nd = MAP_POOL[mapName].basement2nd  ? MAP_POOL[mapName].basement2nd  : '';
-  map.blueprint.basement    = MAP_POOL[mapName].basement     ? MAP_POOL[mapName].basement     : '';
-  map.blueprint.floor1st    = MAP_POOL[mapName].floor1st     ? MAP_POOL[mapName].floor1st     : '';
-  map.blueprint.floor2nd    = MAP_POOL[mapName].floor2nd     ? MAP_POOL[mapName].floor2nd     : '';
-  map.blueprint.floor3rd    = MAP_POOL[mapName].floor3rd     ? MAP_POOL[mapName].floor3rd     : '';
-  map.blueprint.roof        = MAP_POOL[mapName].roof         ? MAP_POOL[mapName].roof         : '';
+  map.blueprint.basement2nd = MAP_POOL[mapName][mapType].basement2nd  ?
+    MAP_POOL[mapName][mapType].basement2nd  : '';
+  map.blueprint.basement    = MAP_POOL[mapName][mapType].basement     ?
+    MAP_POOL[mapName][mapType].basement     : '';
+  map.blueprint.floor1st    = MAP_POOL[mapName][mapType].floor1st     ?
+    MAP_POOL[mapName][mapType].floor1st     : '';
+  map.blueprint.floor2nd    = MAP_POOL[mapName][mapType].floor2nd     ?
+    MAP_POOL[mapName][mapType].floor2nd     : '';
+  map.blueprint.floor3rd    = MAP_POOL[mapName][mapType].floor3rd     ?
+    MAP_POOL[mapName][mapType].floor3rd     : '';
+  map.blueprint.roof        = MAP_POOL[mapName][mapType].roof         ?
+    MAP_POOL[mapName][mapType].roof         : '';
 
   const newMapData = structuredClone(map);
   return newMapData;

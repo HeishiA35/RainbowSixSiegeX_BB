@@ -62,14 +62,30 @@
   &__setting {
     width: 30dvw;
     height: 30dvh;
+    padding: 2dvh 5dvw;
     background-color: var(--background--dark);
     display: flex;
-    justify-content: center;
     align-items: center;
     position: fixed;
     top: calc(50% - 15dvh);
     left: calc(50% - 15dvw);
     z-index: 600;
+
+    h1 {
+      color: var(--white);
+      font-size: clamp(1.2em, 2vw, 1.8em);
+      font-family: var(--font--ja);
+    }
+
+    label {
+      color: var(--white);
+      font-size: clamp(1em, 1.5vw, 1.2em);
+      font-family: var(--font--ja);
+    }
+
+    input {
+      margin: 0 1dvw;
+    }
   }
 
   &__penSetting {

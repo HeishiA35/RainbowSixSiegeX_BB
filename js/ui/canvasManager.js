@@ -58,6 +58,7 @@ import { saveHistory, updateCanvas, updateStaticCanvasCache } from "./controller
  * @property {Object} selectedData - 選択中のマップ情報
  * @property {string|null} selectedData.map
  * @property {string|null} selectedData.floor
+ * @property {string} selectedData.mapType
  * @property {CanvasContext} context - キャンバス要素とコンテキスト
  * @property {Object} setting - スケール設定
  * @property {number} setting.maxScale
@@ -77,6 +78,7 @@ export const CANVAS_DATA = {
   selectedData: {
     map: null,
     floor: null,
+    mapType: 'rawMap',
   },
 
   context: {
