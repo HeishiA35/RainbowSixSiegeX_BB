@@ -1446,7 +1446,19 @@
         <button class="c-modal__close--white" id="js-menu__setting--close">
           <img src="image/materials/menu__close--white.svg">
         </button>
-        <p>Coming Soon</p>
+        <div class="c-modal__setting--map">
+          <form id="js-mapImageSetting">
+            <h1>表示マップ</h1>
+            <div class="c-modal__map-setting--branch">
+              <input type="radio" id="js-raw-map" name="map-type" value="rawMap" checked>
+              <label for="js-raw-map">画像のみ</label>
+            </div>
+            <div class="c-modal__map-setting--branch">
+              <input type="radio" id="js-named-map" name="map-type" value="namedMap">
+              <label for="js-named-map">名前付き画像</label>
+            </div>
+          </form>
+        </div>
       </div>
     </dialog> <!--dialogSetting-->
     <dialog class="c-modal" id="js-confirm">

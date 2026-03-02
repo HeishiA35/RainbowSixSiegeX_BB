@@ -7,6 +7,7 @@ import {
   SELECTOR_CLASSNAMES,
   SELECTOR_DATA,
   ELEMENT_IDS,
+  FORM_ID,
 } from "../data/selector.js";
 
 import {
@@ -101,6 +102,7 @@ import {
   handleDocumentClick,
   handleReturnClick,
   handleHowToUseButtonClick,
+  handleMapImageSettingChange,
 } from "../ui/handlers.js";
 
 import {
@@ -194,6 +196,11 @@ function initSetting() {
   initOpenModal (modalId);
   initClosePreModal(modalId, modalIdToClose, classNameToActivateForClosing);
   initCloseModal(modalId);
+
+  const mapImageSetting = document.getElementById(FORM_ID.mapImageSetting);
+  mapImageSetting.addEventListener('change', (e) => {
+    handleMapImageSettingChange(e);
+  })
 };
 
 /**
@@ -531,7 +538,7 @@ function initStampBehavior() {
   })
 } 
 
-function initMapSetting() {
+function initMapSelection() {
   const modalId = MODAL_IDS.mapSetting;
   initOpenModal(modalId);
   initCloseModal(modalId);
@@ -570,7 +577,7 @@ function initModals() {
   initOperatorSelections();
   initStampCollection();
   //memo: マップ
-  initMapSetting();
+  initMapSelection();
   initFloorSetting();
 };
 

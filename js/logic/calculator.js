@@ -204,7 +204,7 @@ export function getStampPositionsToRecord(e) {
  * @param {import("../ui/canvasManager.js").CanvasContext} param0.context - CANVAS_DATAのcontext情報
  */
 export function resizeCanvas({context}) {
-  const resolutionMultiplier = 1;
+  const resolutionMultiplier = 1.5;
   const dpr = window.devicePixelRatio || 1;
   const scaleFactor = dpr * resolutionMultiplier;
   const { main, cache, container } = context; 

@@ -140,6 +140,10 @@ export const BUTTON_IDS = {
   },
 }
 
+export const FORM_ID = {
+  mapImageSetting: 'js-mapImageSetting',
+}
+
 /****className*****/
 
 /**
