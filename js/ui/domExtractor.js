@@ -228,7 +228,6 @@ export function identifyStampContainer(e) {
   }
 };
 
-
 export function initCanvasContext() {
   const container = document.getElementById(ELEMENT_IDS.canvas.container);
   const mainCanvas = document.getElementById(ELEMENT_IDS.canvas.canvas);
