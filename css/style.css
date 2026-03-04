@@ -2072,9 +2072,6 @@ z-index memo
   align-items: center;
   gap: 2px;
 }
-.p-canvas__operator--items p {
-  width: 100%;
-}
 .p-canvas__operator--items img {
   width: 7dvh;
   max-width: 5dvw;

@@ -255,7 +255,6 @@ export function resetLegendOperatorActivations(targetId = null) {
   const itemCloses = Array.from(document.querySelectorAll(SELECTOR_DATA.legend.close));
 
   clearOperatorButtonStateInLegend(targetId);
-  console.log(OPERATOR_STATE);
   applyElementsDeactivation(operatorContainers, ACTIVE_CLASSNAMES.operator);
   applyElementsDeactivation(operatorItems, ACTIVE_CLASSNAMES.item);
   applyElementsDeactivation(itemCloses, ACTIVE_CLASSNAMES.close);
