@@ -41,10 +41,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-bank-blueprints/r6-maps-bank-blueprint-4.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-3.png',
-      floor1st: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-2.png',
-      roof: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-4.png',
+      basement: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-3.jpg',
+      floor1st: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-bank-blueprints/named_map/r6-maps-bank-blueprint-4.jpg',
     },
   },
 
@@ -56,9 +56,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-border-blueprints/r6-maps-border-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-2.png',
-      roof: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-border-blueprints/named_map/r6-maps-border-blueprint-3.jpg',
     },
   },
 
@@ -71,10 +71,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-chalet-blueprints/r6-maps-chalet-blueprint-4.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-3.png',
-      roof: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-4.png',
+      basement: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-chalet-blueprints/named_map/r6-maps-chalet-blueprint-4.jpg',
     },
   },
 
@@ -87,10 +87,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-clubhouse-blueprints/r6-maps-clubhouse-blueprint-4.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-3.png',
-      roof: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-4.png',
+      basement: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-clubhouse-blueprints/named_map/r6-maps-clubhouse-blueprint-4.jpg',
     },
   },
 
@@ -102,9 +102,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-coastline-blueprints/r6-maps-coastline-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-2.png',
-      roof: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-coastline-blueprints/named_map/r6-maps-coastline-blueprint-3.jpg',
     },
   },
 
@@ -117,10 +117,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-consulate-blueprints_may23/r6-maps-consulat-blueprints_may23/r6-maps-consulate-blueprint-4.jpg',
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-3.png',
-      roof: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-4.png',
+      basement: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-consulate-blueprints_may23/named_map/r6-maps-consulate-blueprint-4.jpg',
     },
   },
     
@@ -132,9 +132,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-emeraldplains-blueprints/r6-maps-emeraldplains-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-2.png',
-      roof: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-3.jpg',
     },
   },
 
@@ -146,9 +146,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-fortress-blueprints/r6-maps-fortress-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-2.png',
-      roof: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-4.png',
+      floor1st: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-fortress-blueprints/named_map/r6-maps-fortress-blueprint-4.jpg',
     },
   },
 
@@ -161,10 +161,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-kafe-blueprints/r6-maps-kafe-blueprint-4.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-2.png',
-      floor3rd: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-3.png',
-      roof: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-4.png',
+      floor1st: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-2.jpg',
+      floor3rd: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-kafe-blueprints/named_map/r6-maps-kafe-blueprint-4.jpg',
     },
   },
 
@@ -178,11 +178,11 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/r6-maps-kanal-blueprint-5.jpg'
     },
     namedMap: {
-      basement2nd: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-1.png',
-      basement: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-2.png',
-      floor1st: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-3.png',
-      floor2nd: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-4.png',
-      roof: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-5.png',
+      basement2nd: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-1.jpg',
+      basement: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-2.jpg',
+      floor1st: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-3.jpg',
+      floor2nd: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-4.jpg',
+      roof: 'image/maps/r6-maps-kanal-blueprints/r6-maps-kanal-blueprints/named_map/r6-maps-kanal-blueprint-5.jpg',
     },
   },
 
@@ -195,10 +195,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-lair-blueprints/r6-maps-lair-blueprints/r6-maps-lair-blueprint-4.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-3.png',
-      roof: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-4.png',
+      basement: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-lair-blueprints/named_map/r6-maps-lair-blueprint-4.jpg',
     },
   },
 
@@ -211,10 +211,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-nighthavenlabs-blueprints/r6-maps-nighthavenlabs-blueprint-4.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-3.png',
-      roof: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-4.png',
+      basement: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-nighthavenlabs-blueprints/named_map/r6-maps-nighthavenlabs-blueprint-4.jpg',
     },
   },
 
@@ -228,11 +228,11 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-oregon-blueprints/r6-maps-oregon-blueprint-5.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-2.png',
-      floor2nd: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-3.png',
-      floor3rd: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-4.png',
-      roof: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-5.png',
+      basement: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-3.jpg',
+      floor3rd: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-4.jpg',
+      roof: 'image/maps/r6-maps-oregon-blueprints/named_map/r6-maps-oregon-blueprint-5.jpg',
     },
   },
 
@@ -244,9 +244,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-outback-blueprints/r6-maps-outback-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-2.png',
-      roof: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-outback-blueprints/named_map/r6-maps-outback-blueprint-3.jpg',
     },
   },
 
@@ -258,9 +258,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-skyscraper-blueprints/r6-maps-skyscraper-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-2.png',
-      roof: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-3.jpg',
     },
   },
 
@@ -272,9 +272,9 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-themepark-blueprints/r6-maps-themepark-blueprints/r6-maps-themepark-blueprint-3.jpg'
     },
     namedMap: {
-      floor1st: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-1.png',
-      floor2nd: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-2.png',
-      roof: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-3.png',
+      floor1st: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-1.jpg',
+      floor2nd: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-2.jpg',
+      roof: 'image/maps/r6-maps-themepark-blueprints/named_map/r6-maps-themepark-blueprint-3.jpg',
     },
   },
 
@@ -287,10 +287,10 @@ export const MAP_POOL = {
       roof: 'image/maps/r6-maps-villa-blueprints/r6-maps-villa-blueprint-5.jpg'
     },
     namedMap: {
-      basement: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-1.png',
-      floor1st: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-3.png',
-      floor2nd: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-4.png',
-      roof: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-5.png',
+      basement: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-3.jpg',
+      floor2nd: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-4.jpg',
+      roof: 'image/maps/r6-maps-villa-blueprints/named_map/r6-maps-villa-blueprint-5.jpg',
     },
   }
 }

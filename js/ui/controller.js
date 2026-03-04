@@ -270,7 +270,7 @@ export function deactivateGears() {
 
 /*****canvas*****/
 export function updateStaticCanvasCache(CANVAS_DATA) {
-  const {selectedData, context, setting, state, drawnContents} = CANVAS_DATA;
+  const {selectedData, context, state, drawnContents} = CANVAS_DATA;
   const {cache, mapImage} = context;
 
   cache.ctx.clearRect(0, 0, cache.el.width, cache.el.height);
@@ -294,8 +294,6 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
 
   applyScaleRatio(CANVAS_DATA);
 
-  //if(drawnContents.lines[selectedData.floor]) return;
-
   drawnContents.lines[selectedData.floor].forEach(line => {
     cache.ctx.beginPath();
     cache.ctx.lineCap = 'round';
@@ -316,9 +314,6 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
       cache.ctx.stroke();
     }
   });
-
-
-  //if(drawnContents.stamps[selectedData.floor]) return;
 
   drawnContents.stamps[selectedData.floor].forEach(stamp => {
     if(stamp.points) {
@@ -433,9 +428,6 @@ export function pinchCanvasZoom(TOUCH_STATE, CANVAS_DATA) { //HACK: calculator„Å
     state.translate.vY = currentCenter.vY - (lastPinchCenter.vY - state.translate.vY) * scaleRatio;
     state.currentImageScale = nextScale;
     state.imageScaleIndex = Math.round((state.currentImageScale - 1) / setting.scaleStep);
-    
-    updateStaticCanvasCache(CANVAS_DATA);
-    updateCanvas(CANVAS_DATA);
   }
   TOUCH_STATE.lastPinchDistance = currentDistance;
   TOUCH_STATE.lastPinchCenter = currentCenter;

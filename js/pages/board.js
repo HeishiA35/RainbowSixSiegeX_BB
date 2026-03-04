@@ -40,6 +40,7 @@ import {
   getLegendContents,
   getModalElements,
   getButtonElementsById,
+  initCanvasContext,
 } from "../ui/domExtractor.js";
 
 import {
@@ -112,8 +113,6 @@ import {
   loadMapImage,
 } from "../ui/canvasManager.js";
 
-const OPERATOR_HEADCOUNT = 5;
-
 /*****ロード*****/
 function setupDefaultBehaviors() {
   document.querySelectorAll('img').forEach(img => {
@@ -131,6 +130,7 @@ function setupDefaultBehaviors() {
   });
 
   window.addEventListener('resize', () => {
+    initCanvasContext();
     initMapImageSize(CANVAS_DATA);
     resizeCanvas(CANVAS_DATA);
     updateStaticCanvasCache(CANVAS_DATA);
@@ -379,18 +379,6 @@ function initConfirmDialogButton(clearId, CANVAS_DATA) {
 }
 
 /*****canvas*****/
-function initCanvasContext() {
-  const container = document.getElementById(ELEMENT_IDS.canvas.container);
-  const mainCanvas = document.getElementById(ELEMENT_IDS.canvas.canvas);
-
-  CANVAS_DATA.context.container = container;
-  CANVAS_DATA.context.main.el = mainCanvas;
-  CANVAS_DATA.context.main.ctx = mainCanvas.getContext('2d');
-
-  const staticCanvas = document.createElement('canvas');
-  CANVAS_DATA.context.cache.el = staticCanvas,
-  CANVAS_DATA.context.cache.ctx = staticCanvas.getContext('2d');
-}
 
 
 function buildCanvas() {
