@@ -318,8 +318,9 @@ function initToolSettings() {
   const colorPicker = document.getElementById(ELEMENT_IDS.tool.color.picker); 
   colorPicker.addEventListener('input', (e) => {
     const colorValue = e.target.value;
+    const id = colorPicker.parentNode.dataset.draw;
     changeColor(colorValue);
-    applyCurrentColor(colorValue, PEN_ID);
+    applyCurrentColor(colorValue, id);
   });
 
   const opacityIds = ELEMENT_IDS.tool.opacity;
@@ -467,7 +468,6 @@ function setupLegend() {
   const playerColorButtons = document.querySelectorAll(SELECTOR_CLASSNAMES.playerColor);
   const nameForms = document.querySelectorAll(SELECTOR_CLASSNAMES.playerName);
   const closeButtons = document.querySelectorAll(SELECTOR_CLASSNAMES.itemClose);
-  console.log(closeButtons);
 
   legendButton.addEventListener('click', (e) => {
     handleLegendButtonClick(legendContents);

@@ -151,7 +151,7 @@ export function displayCurrentFloorName({floor}) {
 export function applyCurrentColor(colorValue, id) {
   const displayColor = document.getElementById(ELEMENT_IDS.tool.display.pen);
   
-  if(id === PEN_ID) {
+  if(id === 'color') {
     displayColor.style.backgroundColor = colorValue;
   } else {
     console.log('オペレータ色変更');
