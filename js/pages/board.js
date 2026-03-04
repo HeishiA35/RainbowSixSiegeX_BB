@@ -468,7 +468,6 @@ function setupLegend() {
   const playerColorButtons = document.querySelectorAll(SELECTOR_CLASSNAMES.playerColor);
   const nameForms = document.querySelectorAll(SELECTOR_CLASSNAMES.playerName);
   const closeButtons = document.querySelectorAll(SELECTOR_CLASSNAMES.itemClose);
-  console.log(closeButtons);
 
   legendButton.addEventListener('click', (e) => {
     handleLegendButtonClick(legendContents);

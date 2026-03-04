@@ -255,7 +255,6 @@ export function resetLegendOperatorActivations(targetId = null) {
   const itemCloses = Array.from(document.querySelectorAll(SELECTOR_DATA.legend.close));
 
   clearOperatorButtonStateInLegend(targetId);
-  console.log(OPERATOR_STATE);
   applyElementsDeactivation(operatorContainers, ACTIVE_CLASSNAMES.operator);
   applyElementsDeactivation(operatorItems, ACTIVE_CLASSNAMES.item);
   applyElementsDeactivation(itemCloses, ACTIVE_CLASSNAMES.close);
@@ -295,7 +294,7 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
 
   applyScaleRatio(CANVAS_DATA);
 
-  if(drawnContents.lines[selectedData.floor]) return;
+  //if(drawnContents.lines[selectedData.floor]) return;
 
   drawnContents.lines[selectedData.floor].forEach(line => {
     cache.ctx.beginPath();
@@ -319,7 +318,7 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
   });
 
 
-  if(drawnContents.stamps[selectedData.floor]) return;
+  //if(drawnContents.stamps[selectedData.floor]) return;
 
   drawnContents.stamps[selectedData.floor].forEach(stamp => {
     if(stamp.points) {
