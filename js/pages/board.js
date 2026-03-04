@@ -113,8 +113,6 @@ import {
   loadMapImage,
 } from "../ui/canvasManager.js";
 
-const OPERATOR_HEADCOUNT = 5;
-
 /*****ロード*****/
 function setupDefaultBehaviors() {
   document.querySelectorAll('img').forEach(img => {
