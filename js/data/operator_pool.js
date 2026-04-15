@@ -198,7 +198,8 @@ export const OPERATOR_POOL = {
       icon: 'image/icon_operator/attacker/ATK16_jackal.png',
       ability: {img: 'image/icon_ability/attacker/jackal_eyenox_mode_III.png', abilityName:'eyenoxModelIII'},
       gadget1: claymore,
-      gadget2: smokeGranade
+      gadget2: smokeGranade,
+      gadget3: fragGrenade,
     },
 
     ying: {
@@ -394,7 +395,8 @@ DEF: {
       icon: 'image/icon_operator/difender/DEF2_smoke.png',
       ability: {img: 'image/icon_ability/defender/smoke_remoto_gas_granade.png', abilityName:'remotoGasGranade'},
       gadget1: barbedWire,
-      gadget2: proximityAlarm
+      gadget2: proximityAlarm,
+      gadget3: deployableShield,
     },
 
     mute: {
