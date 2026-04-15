@@ -124,7 +124,7 @@ export const MAP_POOL = {
     },
   },
     
-  emeraldplains: { //マップ制作から
+  emeraldplains: {
     img: 'image/maps/r6-maps-emeraldplains-blueprints/r6s_maps_emeraldplains__1_.jpg',
     rawMap: {
       floor1st: 'image/maps/r6-maps-emeraldplains-blueprints/r6-maps-emeraldplains-blueprint-1.jpg',
@@ -136,6 +136,24 @@ export const MAP_POOL = {
       floor2nd: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-2.jpg',
       roof: 'image/maps/r6-maps-emeraldplains-blueprints/named_map/r6-maps-emeraldplains-blueprint-3.jpg',
     },
+  },
+
+  favela: {
+    img: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela__1_.avif',
+    rawMap: {
+      basement: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela-blueprint-3.jpg',
+      floor3rd: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela-blueprint-4.jpg',
+      roof: 'image/maps/r6-maps-favela-blueprints/r6-maps-favela-blueprint-5.jpg',
+    },
+    namedMap: {
+      basement: 'image/maps/r6-maps-favela-blueprints/named_map/r6-maps-favela-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-favela-blueprints/named_map/r6-maps-favela-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-favela-blueprints/named_map/r6-maps-favela-blueprint-3.jpg',
+      floor3rd: 'image/maps/r6-maps-favela-blueprints/named_map/r6-maps-favela-blueprint-4.jpg',
+      roof: 'image/maps/r6-maps-favela-blueprints/named_map/r6-maps-favela-blueprint-5.jpg',
+    }
   },
 
   fortress: {
@@ -262,6 +280,22 @@ export const MAP_POOL = {
       floor2nd: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-2.jpg',
       roof: 'image/maps/r6-maps-skyscraper-blueprints/named_map/r6-maps-skyscraper-blueprint-3.jpg',
     },
+  },
+
+  stadiumbravo: {
+    img: 'image/maps/r6-maps-stadiumbravo-blueprints/stadiumB_keyart.avif',
+    rawMap: {
+      basement: 'image/maps/r6-maps-stadiumbravo-blueprints/r6-maps-stadiumbravo-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-stadiumbravo-blueprints/r6-maps-stadiumbravo-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-stadiumbravo-blueprints/r6-maps-stadiumbravo-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-stadiumbravo-blueprints/r6-maps-stadiumbravo-blueprint-4.jpg',
+    },
+    namedMap: {
+      basement: 'image/maps/r6-maps-stadiumbravo-blueprints/named_map/r6-maps-stadiumbravo-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-stadiumbravo-blueprints/named_map/r6-maps-stadiumbravo-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-stadiumbravo-blueprints/named_map/r6-maps-stadiumbravo-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-stadiumbravo-blueprints/named_map/r6-maps-stadiumbravo-blueprint-4.jpg',
+    }
   },
 
   themepark: {
