@@ -10,6 +10,7 @@ import {
 import {
   ACTIVE_CLASSNAMES,
   BUTTON_IDS, ELEMENT_IDS,
+  FORM_ID,
   SELECTOR_CLASSNAMES,
   SELECTOR_DATA,
 } from "../data/selector.js";
@@ -27,6 +28,8 @@ import {
 } from "../logic/switcher.js";
 
 import {
+  getCompass,
+  getElementArrayById,
   getOperatorDOM,
   getSelectedOperatorIcons,
 } from "./domExtractor.js";
@@ -181,7 +184,6 @@ export function applyCurrentBold(settingId) {
 export function applyConfirmDialogMessage(textJa, textEn) {
   const textDisplayJa = document.getElementById(ELEMENT_IDS.dialog.text.ja);
   const textDisplayEn = document.getElementById(ELEMENT_IDS.dialog.text.en);
-
   textDisplayJa.textContent = textJa;
   textDisplayEn.textContent = textEn;
 }
@@ -197,7 +199,7 @@ export function applyConfirmDialogMessage(textJa, textEn) {
 export function insertBadge(sideKey, operatorIconContainer, index) {
   const operatorNumber = index + 1;
   const badgeHTML = `
-    <div class="selected" id="js-count${sideKey}--${operatorNumber}">
+    <div class="is-selected" id="js-count${sideKey}--${operatorNumber}">
       <p>${operatorNumber}</p>
     </div>
   `;
@@ -213,7 +215,7 @@ export function removeBadge(operatorIconContainer) {
   if(!operatorIconContainer) return;
 
   const badge = operatorIconContainer.firstElementChild;
-  const isBadge = badge.classList.contains('selected');
+  const isBadge = badge.classList.contains('is-selected');
   if(isBadge) {
     badge.remove();
   }
@@ -285,6 +287,158 @@ export function updateSelectedOperatorIcons(sideKey) {
     }
   }
 };
+
+/*****setting*****/
+export function initSettingOptions(settings) {
+  //マップイメージ
+  const mapImageSetting = document.getElementById(FORM_ID.mapImage);
+  const radioList = Array.from(mapImageSetting["map-type"]);
+  radioList.forEach(radio => {
+    radio.removeAttribute('checked');
+    if(radio.value === settings.mapImageType) {
+      radio.setAttribute('checked', '');
+    }
+  });
+
+  //回転角度
+  const angleSetting = document.getElementById(FORM_ID.spin);
+  const angleSelect = angleSetting.querySelector('select');
+  angleSelect.value = settings.spinAngle;
+
+  //最小・最大拡大率
+  const zoomScaleSettings = getElementArrayById(FORM_ID.zoomScale);
+  zoomScaleSettings.forEach(zoomScale => {
+    const intSelect = zoomScale['scale-int'];
+    const decSelect = zoomScale['scale-dec'];
+    
+    const intOptions = Array.from(intSelect.children);
+    const decOptions = Array.from(decSelect.children);
+
+    [...intOptions, ...decOptions].forEach(option => option.removeAttribute('selected'));
+    
+    if(intSelect.dataset.scaleSetting.startsWith('min')) {
+      const minInt = Math.floor(settings.minScale);
+      const minDec = Math.floor(settings.minScale * 10) % 10;
+      intSelect.value = minInt;
+      decSelect.value = minDec;
+    } else if(intSelect.dataset.scaleSetting.startsWith('max')) {
+      const maxInt = Math.floor(settings.maxScale);
+      const maxDec = Math.floor(settings.maxScale * 10) % 10;
+      intSelect.value = maxInt;
+      decSelect.value = maxDec;
+    };
+  });
+
+  const scaleValues = {
+    min: settings.minScale,
+    max: settings.maxScale
+  };
+  
+  applyScaleIntOptions(scaleValues);
+  applyScaleDecOptions(scaleValues);
+  
+  //スタンプサイズ
+  const stampSize = document.getElementById(FORM_ID.stampSize);
+  const stampSizeOptions = Array.from(stampSize["stamp-size"].children);
+  stampSizeOptions.forEach(option => {
+    option.removeAttribute('selected');
+    if(Number(option.value) === Number(settings.stampSize)) {
+      option.setAttribute('selected', '');
+    }
+  });
+}
+
+export function applySpinOptions(CANVAS_DATA) {
+  const spinForm = document.getElementById(FORM_ID.spin);
+  const spinSelect = spinForm.querySelector('select');
+
+  spinSelect.value = CANVAS_DATA.state.angleIndex;
+}
+
+export function applyScaleIntOptions(scaleValues, isMinChanged = true, isMaxChanged = true) {
+  const minForm = document.getElementById(FORM_ID.zoomScale.min);
+  const maxForm = document.getElementById(FORM_ID.zoomScale.max);
+  const minSelect = minForm.querySelector(SELECTOR_DATA.setting.minInt);
+  const maxSelect = maxForm.querySelector(SELECTOR_DATA.setting.maxInt);
+
+  const allOptions = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  if(isMinChanged) {
+    const currentMax = Number(maxSelect.value);
+    maxSelect.innerHTML = '';
+    allOptions.forEach(num => {
+      if(num >= Math.floor(scaleValues.min)) {
+        const option = new Option(num, num);
+        if(num === currentMax) option.selected = true;
+        maxSelect.add(option);
+      }
+    });
+  }
+
+  if(isMaxChanged) {
+    const currentMin = Number(minSelect.value);
+    minSelect.innerHTML = '';
+    allOptions.forEach(num => {
+      if(num <= Math.floor(scaleValues.max)) {
+        const option = new Option(num, num);
+        if(num === currentMin) option.selected = true;
+        minSelect.add(option);
+      }
+    });
+  }
+}
+
+export function applyScaleDecOptions(scaleValues, isMinChanged = true, isMaxChanged = true) {
+  const minForm = document.getElementById(FORM_ID.zoomScale.min);
+  const maxForm = document.getElementById(FORM_ID.zoomScale.max);
+  const minSelect = minForm.querySelector(SELECTOR_DATA.setting.minDec);
+  const maxSelect = maxForm.querySelector(SELECTOR_DATA.setting.maxDec);
+
+  const getDec = (value) => (Math.floor(value * 10) % 10);
+  const allOptions = [0, 2, 4, 6, 8];
+
+  if(scaleValues.min > scaleValues.max) {
+    if(isMinChanged) {
+      minSelect.value = getDec(scaleValues.max);
+      scaleValues.min = scaleValues.max;
+    } else if(isMaxChanged) {
+      maxSelect.value = getDec(scaleValues.max);
+      scaleValues.max = scaleValues.min;
+    }
+  }
+
+  const minInt = Math.floor(scaleValues.min);
+  const maxInt = Math.floor(scaleValues.max);
+  const isIntEqual = minInt === maxInt;
+
+  const currentMax = Number(maxSelect.value);
+  maxSelect.innerHTML = '';
+  allOptions.forEach(num => {
+    if(!isIntEqual || num >= getDec(scaleValues.min)) {
+      const option = new Option(num, num);
+      if(num === currentMax) option.selected = true;
+      maxSelect.add(option);
+    }
+  });
+
+  const currentMin = Number(minSelect.value);
+  minSelect.innerHTML = '';
+  allOptions.forEach(num => {
+    if(!isIntEqual || num <= getDec(scaleValues.max)) {
+      const option = new Option(num, num);
+      if(num === currentMin) option.selected = true;
+      minSelect.add(option);
+    }
+  });
+
+  const MAX_LIMIT = 8;
+  if(maxInt === MAX_LIMIT) {
+    maxSelect.innerHTML = '';
+    const option = new Option(0, 0);
+    option.selected = true;
+    maxSelect.add(option);
+  }
+}
 
 /*****howToUse*****/
 export function setExplanationPosition(explanations) {
@@ -584,6 +738,16 @@ export function changeCursorOnCanvas(toolId) {
     canvas.addEventListener('mousedown', () => {
       canvas.style.cursor = 'crosshair';
     });
+  } else if (toolId ==='stamp') {
+    canvas.addEventListener('mouseover', () => {
+      canvas.style.cursor = 'grabbing';
+    });
+    canvas.addEventListener('mousedown', () => {
+      canvas.style.cursor = 'grabbing';
+    });
+    canvas.addEventListener('mouseup', () => {
+      canvas.style.cursor = 'grab';
+    });
   }
 };
 
@@ -608,6 +772,80 @@ export function toggleHistoryButtonActive(CANVAS_DATA) {
     redoButton.removeAttribute('style');
   }
 }
+
+export function applyCompassImageSpin(compass, CANVAS_DATA) {
+  switch (Number(CANVAS_DATA.state.angleIndex)) {
+    case 0:
+      compass.image.style.transform = "rotate(0deg)";
+      break;
+    case 1:
+      compass.image.style.transform = "rotate(90deg)";
+      break;
+    case 2:
+      compass.image.style.transform = "rotate(180deg)";
+      break;
+    case 3:
+      compass.image.style.transform = "rotate(270deg)";
+      break;
+  }
+}
+
+export function applyCompassDirectionSpin(buttonId, compass) {
+  if(buttonId === 'left') {
+    compass.left.slot.textContent = compass.top.direction;
+    compass.bottom.slot.textContent = compass.left.direction;
+    compass.right.slot.textContent = compass.bottom.direction;
+    compass.top.slot.textContent = compass.right.direction;
+  } else if(buttonId === 'right') {
+    compass.right.slot.textContent = compass.top.direction;
+    compass.bottom.slot.textContent = compass.right.direction;
+    compass.left.slot.textContent = compass.bottom.direction;
+    compass.top.slot.textContent = compass.left.direction;
+  }
+  
+  compass.allSlots.forEach(slot => {
+    slot.style.color = '';
+    if(slot.textContent === 'N') {
+      slot.style.color = '#ff3d2d';
+    }
+  });
+}
+
+export function initCompass(CANVAS_DATA) {
+  const compass = getCompass();
+  
+  applyCompassImageSpin(compass, CANVAS_DATA);
+  
+  let directions;
+
+  switch(Number(CANVAS_DATA.state.angleIndex)) {
+    case 0:
+      directions = ["N", "E", "S", "W"];
+      break;
+    case 1:
+      directions = ["W", "N", "E", "S"];
+      break;
+    case 2:
+      directions = ["S", "W", "N", "E"];
+      break;
+    case 3:
+      directions = ["E", "S", "W", "N"];
+      break;
+  }
+
+  compass.top.slot.textContent = directions[0];
+  compass.right.slot.textContent = directions[1];
+  compass.bottom.slot.textContent = directions[2];
+  compass.left.slot.textContent = directions[3];
+
+  compass.allSlots.forEach(slot => {
+    slot.style.color = '';
+    if(slot.textContent === 'N') {
+      slot.style.color = '#ff3d2d';
+    }
+  });
+}
+
 
 export function applyScaleRatio({setting, state}) {
   const scaleRatioEl = document.getElementById(ELEMENT_IDS.scaleRatio);

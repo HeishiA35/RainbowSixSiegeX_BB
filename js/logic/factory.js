@@ -154,7 +154,7 @@ export function createStamp(e ,currentStamp = null) {
  */
 export function createStampData(e, tempStamp) {
   const stampPositions = getStampPositionsToRecord(e);
-  const logicalPositions = viewportToLogical(stampPositions.vX, stampPositions.vY);
+  const logicalPositions = viewportToLogical(stampPositions.vX, stampPositions.vY, CANVAS_DATA);
   const stampData = {
     id: tempStamp.id,
     img: tempStamp.src,
@@ -162,4 +162,48 @@ export function createStampData(e, tempStamp) {
   };
 
   return stampData;
+}
+
+/*****JSON*****/
+export function createExportJSONData(CANVAS_DATA, extension) {
+  const { selectedData, drawnContents} = CANVAS_DATA;
+  let exportData;
+  if(extension === 'json') {
+    exportData = {
+      appName: "R6SX-Briefing-Board",
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      map: selectedData.map,
+      contents: drawnContents,
+    }
+  } else {
+    const contents = {
+      lines: drawnContents.lines[selectedData.floor],
+      stamps: drawnContents.stamps[selectedData.floor]
+    }
+    
+    exportData = {
+      appName: "R6SX-Briefing-Board",
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      map: selectedData.map,
+      floor: selectedData.floor,
+      contents: contents
+    }
+  }
+
+  const jsonString = JSON.stringify(exportData, null, 2);
+
+  return jsonString;
+}
+
+export function generateFileName(mapName, floorName, extension) {
+  const now = new Date();
+  const date = now.toLocaleDateString().replace(/\//g, '-');
+  const time = `${now.getHours()}-${now.getMinutes()}`;
+  const fileName = extension === 'json' ?
+    `tactics_${mapName}_${date}_${time}.${extension}` :
+    `tactics_${mapName}_${floorName}_${date}_${time}.${extension}`;
+
+  return fileName;
 }

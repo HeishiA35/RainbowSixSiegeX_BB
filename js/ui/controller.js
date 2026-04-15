@@ -9,6 +9,7 @@ import {
   BUTTON_IDS,
   SELECTOR_CLASSNAMES,
   HOW_TO_USE_EXPLANATION,
+  MODAL_IDS,
  } from "../data/selector.js";
 
 import {
@@ -28,11 +29,14 @@ import {
   logicalToViewport,
   isLineColliding,
   isRectColliding,
+  changeCanvasScale,
 } from "../logic/calculator.js";
 
 import {
+  createExportJSONData,
   createStamp,
-  createStampData
+  createStampData,
+  generateFileName
 } from "../logic/factory.js";
 
 import {
@@ -49,7 +53,9 @@ import {
 
 import {
   OPERATOR_ICON_CONTAINERS,
-  getButtonElementsById,
+  externalMoladElementsByOpenId,
+  getCompass,
+  getElementArrayById,
   getModalElements,
   getOperatorDOM,
   getSelectedOperatorData,
@@ -71,6 +77,13 @@ import {
   toggleHistoryButtonActive,
   setExplanationPosition,
   setHowToUseRectPosition,
+  applyConfirmDialogMessage,
+  changeCursorOnCanvas,
+  applyScaleIntOptions,
+  applyScaleDecOptions,
+  applyCompassImageSpin,
+  applyCompassDirectionSpin,
+  applySpinOptions,
 } from "./domApplier.js";
 
 import { 
@@ -80,6 +93,7 @@ import {
 } from "./handlers.js";
 
 import {
+  applyImportedData,
   CANVAS_DATA
 } from "./canvasManager.js";
 
@@ -95,12 +109,19 @@ export function disableDoubleTouch(e) {
 
 /*****modal*****/
 
-export function initOpenModal(modalId, classNameToActivate = null) {
-  const modalElements = getModalElements(modalId);
+export function initOpenModal({modalId, classNameToActivate = null, otherOpenId = null}) {
+  const modalElements1 = getModalElements(modalId);
+  const modalElements2 = otherOpenId ? externalMoladElementsByOpenId(modalId, otherOpenId) : undefined;
 
-  if(modalElements.open) {
-    modalElements.open.addEventListener('click', () => {
-      showModal(modalElements.modal, classNameToActivate);
+  if(modalElements1.open) {
+    modalElements1.open.addEventListener('click', () => {
+      showModal(modalElements1.modal, classNameToActivate);
+    });
+  }
+
+  if(modalElements2) {
+    modalElements2.open.addEventListener('click', () => {
+      showModal(modalElements2.modal, classNameToActivate);
     });
   }
 };
@@ -125,6 +146,60 @@ export function initClosePreModal(modalId, modalIdToClose, classNameToActivate =
     });
   }
 };
+
+/*****confirm*****/
+export function showConfirmDialog(textJa, textEn) {
+  const modal = document.getElementById(MODAL_IDS.confirm);
+  const cancelButton = document.getElementById(BUTTON_IDS.confirm.cancel);
+  const okButton = document.getElementById(BUTTON_IDS.confirm.ok);
+
+  applyConfirmDialogMessage(textJa, textEn)
+  showModal(modal);
+
+  return new Promise((resolve) => {
+    const newCancelButton = cancelButton.cloneNode(true);
+    const newOkButton = okButton.cloneNode(true);
+    cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
+    okButton.parentNode.replaceChild(newOkButton, okButton);
+
+    newCancelButton.addEventListener('click', () => {
+      hideModal(modal);
+      resolve(false);
+    });
+
+    newOkButton.addEventListener('click', () => {
+      hideModal(modal);
+      resolve(true);
+    });
+  });
+}
+/*****setting*****/
+export function initScaleOptions(scaleValues, selectorData, isMinChanged, isMaxChanged) {
+  const isIntChanged = selectorData.endsWith('int');
+
+  if(isIntChanged) {
+    applyScaleIntOptions(scaleValues, isMinChanged, isMaxChanged);
+  }
+  
+  applyScaleDecOptions(scaleValues, isMinChanged, isMaxChanged);
+}
+
+export function initSpinSettingOptions(CANVAS_DATA) {
+  applySpinOptions(CANVAS_DATA);
+}
+
+export function applyLoadedSettings(settings, CANVAS_DATA, STAMP_STATE) {
+  const {selectedData, state, setting} = CANVAS_DATA;
+  selectedData.mapType = settings.mapImageType;
+  state.angleIndex = settings.spinAngle;
+  setting.maxScale = settings.maxScale;
+  setting.minScale = settings.minScale;
+  STAMP_STATE.size = settings.stampSize;
+
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
+}
+
 
 /*****howToUse*****/
 export function initHowToUsePositions() {
@@ -188,7 +263,7 @@ export function shiftHowToUsePage(buttonId) {
  * ツールボタンをすべて非アクティブ化。//コントローラでよい。
  */
 export function resetToolSelections() {
-  const toolButtons = getButtonElementsById(BUTTON_IDS.tool);
+  const toolButtons = getElementArrayById(BUTTON_IDS.tool);
   clearToolState();
   applyElementsDeactivation(toolButtons, ACTIVE_CLASSNAMES.tool);
 };
@@ -272,13 +347,23 @@ export function deactivateGears() {
 export function updateStaticCanvasCache(CANVAS_DATA) {
   const {selectedData, context, state, drawnContents} = CANVAS_DATA;
   const {cache, mapImage} = context;
-
   cache.ctx.clearRect(0, 0, cache.el.width, cache.el.height);
 
-  const destX = state.translate.vX;
-  const destY = state.translate.vY;
+  cache.ctx.save();
+
+  const centerX = context.container.clientWidth / 2;
+  const centerY = context.container.clientHeight / 2;
+  const angle = (state.angleIndex * 90 * Math.PI) / 180;
+
+  cache.ctx.translate(centerX, centerY);
+  cache.ctx.rotate(angle);
+
   const destWidth = state.initialLogicalDraw.width * state.currentImageScale;
   const destHeight = state.initialLogicalDraw.height * state.currentImageScale;
+
+  const drawX = state.translate.vX - (destWidth / 2);
+  const drawY = state.translate.vY - (destHeight / 2);
+
 
   cache.ctx.drawImage(
     mapImage,
@@ -286,11 +371,13 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
     0,                //memo:描画開始Y座標
     mapImage.width,   //memo:描画サイズ横
     mapImage.height,  //memo:描画サイズ縦
-    destX,            //memo:画像の切り抜き開始X座標
-    destY,            //memo:画像の切り抜き開始Y座標
+    drawX,            //memo:画像の切り抜き開始X座標
+    drawY,            //memo:画像の切り抜き開始Y座標
     destWidth,        //memo:画像の切り抜きサイズ横
     destHeight        //memo:画像の切り抜きサイズ縦
   );
+
+  cache.ctx.restore();
 
   applyScaleRatio(CANVAS_DATA);
 
@@ -303,11 +390,11 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
     cache.ctx.globalAlpha = line.opacity;
 
     if(line.points.length > 0) {
-      let startPoint = logicalToViewport(line.points[0].lX, line.points[0].lY);
+      let startPoint = logicalToViewport(line.points[0].lX, line.points[0].lY, CANVAS_DATA, false);
       cache.ctx.moveTo(startPoint.vX, startPoint.vY);
 
       for(let i = 1; i < line.points.length; i++) {
-        let nextPoint = logicalToViewport(line.points[i].lX, line.points[i].lY);
+        let nextPoint = logicalToViewport(line.points[i].lX, line.points[i].lY, CANVAS_DATA, false);
         cache.ctx.lineTo(nextPoint.vX, nextPoint.vY);
       }
 
@@ -316,30 +403,41 @@ export function updateStaticCanvasCache(CANVAS_DATA) {
   });
 
   drawnContents.stamps[selectedData.floor].forEach(stamp => {
-    if(stamp.points) {
+    if('lX' in stamp.points && 'lY' in stamp.points) {
       const img = getCachedImage(stamp.img, () => {
         updateStaticCanvasCache(CANVAS_DATA);
         updateCanvas(CANVAS_DATA);
       });
 
+      
       if(img) {
         const stampSizePx = window.innerWidth * STAMP_STATE.size / 100;
         const halfStampSize = stampSizePx / 2;
-        const stampPoints = logicalToViewport(stamp.points.lX, stamp.points.lY);
+        const stampPoints = logicalToViewport(stamp.points.lX, stamp.points.lY, CANVAS_DATA, false);
+
+        cache.ctx.save();
+
+        cache.ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+        cache.ctx.shadowBlur = 6;
+        
+        cache.ctx.translate(stampPoints.vX, stampPoints.vY);
 
         cache.ctx.drawImage(
           img,
-          stampPoints.vX - halfStampSize,
-          stampPoints.vY - halfStampSize,
+          -halfStampSize,
+          -halfStampSize,
           stampSizePx,
           stampSizePx
         );
+
+        cache.ctx.restore();
       }
     }
   });
 };
 
-export function updateCanvas({context, state}) {
+export function updateCanvas(CANVAS_DATA) {
+  const {context, state} = CANVAS_DATA;
   const {container, main, cache} = context;
   const {tempDraw} = state;
   
@@ -356,11 +454,11 @@ export function updateCanvas({context, state}) {
     main.ctx.strokeStyle = DRAW_STATE.currentColor;
     main.ctx.globalAlpha = DRAW_STATE.currentOpacity;
 
-    const startPoint = logicalToViewport(tempDraw.linePoints[0].lX, tempDraw.linePoints[0].lY);
+    const startPoint = logicalToViewport(tempDraw.linePoints[0].lX, tempDraw.linePoints[0].lY, CANVAS_DATA);
     main.ctx.moveTo(startPoint.vX, startPoint.vY);
 
     for(let i = 1; i < tempDraw.linePoints.length; i++) {
-      const nextPoint = logicalToViewport(tempDraw.linePoints[i].lX, tempDraw.linePoints[i].lY);
+      const nextPoint = logicalToViewport(tempDraw.linePoints[i].lX, tempDraw.linePoints[i].lY, CANVAS_DATA);
       main.ctx.lineTo(nextPoint.vX, nextPoint.vY);
     }
 
@@ -406,17 +504,57 @@ export function applyHistory(CANVAS_DATA) {
   updateCanvas(CANVAS_DATA);
 }
 
+/*****canvasSpin*****/
+export function spinCompassLeft(buttonId, CANVAS_DATA) {
+  if(CANVAS_DATA.state.angleIndex === 0) {
+    CANVAS_DATA.state.angleIndex = 4;
+  }
+  CANVAS_DATA.state.angleIndex--;
+
+  const compass = getCompass();
+  
+  applyCompassImageSpin(compass, CANVAS_DATA);
+  applyCompassDirectionSpin(buttonId, compass);
+}
+
+export function spinCompassRight(buttonId, CANVAS_DATA) {
+  CANVAS_DATA.state.angleIndex++;
+  if(CANVAS_DATA.state.angleIndex === 4) {
+    CANVAS_DATA.state.angleIndex = 0;
+  }
+
+  const compass = getCompass();
+
+  applyCompassImageSpin(compass, CANVAS_DATA);
+  applyCompassDirectionSpin(buttonId, compass);
+}
+
 /*****canvasZoom*****/
 export function pinchCanvasZoom(TOUCH_STATE, CANVAS_DATA) { //HACK: calculatorなどに分割できそう
   const {activePointers, lastPinchDistance, lastPinchCenter} = TOUCH_STATE;
-  const {setting, state} = CANVAS_DATA;
+  const {context, setting, state} = CANVAS_DATA;
   const [p1, p2] = Array.from(activePointers.values());
   const canvasContainer = CANVAS_DATA.context.container;
   const rect = canvasContainer.getBoundingClientRect();
+
+  const centerX = context.container.clientWidth / 2;
+  const centerY = context.container.clientHeight / 2;
+  
   const currentDistance = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
-  const currentCenter = {
-    vX: (p1.clientX + p2.clientX) / 2 - rect.left,
-    vY: (p1.clientY + p2.clientY) / 2 - rect.top
+  let currentCenter = {
+    vX: (p1.clientX + p2.clientX) / 2 - centerX - rect.left,
+    vY: (p1.clientY + p2.clientY) / 2 - centerY - rect.top
+  }
+
+  if(state.angleIndex !== 0) {
+    const angle = (state.angleIndex * 90 * Math.PI) / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const unRotatedX = currentCenter.vX * cos + currentCenter.vY * sin; 
+    const unRotatedY = -currentCenter.vX * sin + currentCenter.vY * cos;
+
+    currentCenter = {vX: unRotatedX, vY: unRotatedY};
   }
   
   if(lastPinchDistance && lastPinchCenter) {
@@ -457,26 +595,75 @@ export function moveCanvasImage(e, TOUCH_STATE, CANVAS_DATA) {
   if(TOUCH_STATE.press) {
     draggedPoint.vX = e.clientX - rect.left;
     draggedPoint.vY = e.clientY - rect.top;
-    state.translate.vX = state.translateBuf.vX - (point.vX - draggedPoint.vX);
-    state.translate.vY = state.translateBuf.vY - (point.vY - draggedPoint.vY);
+
+    const dx = draggedPoint.vX - point.vX;
+    const dy = draggedPoint.vY - point.vY;
+
+    const angle = (-state.angleIndex * 90 * Math.PI) / 180;
+
+    const rotatedDx = dx * Math.cos(angle) - dy * Math.sin(angle);
+    const rotatedDy = dx * Math.sin(angle) + dy * Math.cos(angle);
+
+    state.translate.vX = state.translateBuf.vX + rotatedDx;
+    state.translate.vY = state.translateBuf.vY + rotatedDy;
   } else {
-    point.vX =  e.clientX - rect.left;
-    point.vY =  e.clientY - rect.top;
+    point.vX = e.clientX - rect.left;
+    point.vY = e.clientY - rect.top;
   }
 }
 
 /*****canvasDraw*****/
+export function resetAllDrawnContents(CANVAS_DATA) {
+  CANVAS_DATA.drawnContents = {
+    lines: {
+      basement2nd: [],
+      basement: [],
+      floor1st: [],
+      floor2nd: [],
+      floor3rd: [],
+      roof: [],
+    },
+
+    stamps: {
+      basement2nd: [],
+      basement: [],
+      floor1st: [],
+      floor2nd: [],
+      floor3rd: [],
+      roof: [],
+    },
+  }
+}
+
+export function clearDrawnContents(CANVAS_DATA, clearId) {
+  const {selectedData, drawnContents} = CANVAS_DATA;
+  const isLine = clearId === 'lineClear';
+  const isStamp = clearId === 'stampClear';
+  const isAll = clearId === 'allClear';
+  
+  if(isLine) {
+    drawnContents.lines[selectedData.floor] = [];
+  } else if(isStamp) {
+    drawnContents.stamps[selectedData.floor] = [];
+  } else if(isAll) {
+    drawnContents.lines[selectedData.floor] = [];
+    drawnContents.stamps[selectedData.floor] = [];
+  }
+
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
+}
+
 export function startLineDraw(e) {
   const points = getPointerLocalPositions(e);
-  const logicalPoints = viewportToLogical(points.vX, points.vY);
-
+  const logicalPoints = viewportToLogical(points.vX, points.vY, CANVAS_DATA);
   CANVAS_DATA.state.tempDraw.linePoints = [logicalPoints];
 }
 
 export function drawLine(e) {
   if(TOUCH_STATE.press) {
   const points = getPointerLocalPositions(e);
-  const logicalPoints = viewportToLogical(points.vX, points.vY);
+  const logicalPoints = viewportToLogical(points.vX, points.vY, CANVAS_DATA);
 
   CANVAS_DATA.state.tempDraw.linePoints.push(logicalPoints);
   }
@@ -547,7 +734,6 @@ export function eraseLine(e, CANVAS_DATA) {
 
 /*****canvasStamp*****/
 export function createStampFollowedMouse(e, CANVAS_DATA, currentStamp) {
-  const {selectedData, drawnContents} = CANVAS_DATA;
   const tempStamp = createStamp(e, currentStamp);
   CANVAS_DATA.context.container.appendChild(tempStamp);
 }
@@ -588,7 +774,7 @@ export function deleteTempStamp(tempStamp, CANVAS_DATA) {
 }
 
 export function returnMode() {
-  const buttons = getButtonElementsById(BUTTON_IDS.tool);
+  const buttons = getElementArrayById(BUTTON_IDS.tool);
   const [move, pen, eraser] = buttons;
 
   TOOL_STATE.activeToolId = TOOL_STATE.lastToolId;
@@ -602,7 +788,11 @@ export function returnMode() {
     const playerNumber = OPERATOR_STATE.activeOperatorId.slice(3);
     const playerContainer = document.getElementById(ELEMENT_IDS.legend.operatorContainer[sideKey] + playerNumber);
     applyElementActivation(playerContainer, ACTIVE_CLASSNAMES.operator)
+  } else if(TOOL_STATE.lastToolId === "eraser"){
+    applyElementActivation(eraser, ACTIVE_CLASSNAMES.tool);
   }
+
+  changeCursorOnCanvas(TOOL_STATE.lastToolId);
 }
 
 export function drawStamp(e) {
@@ -637,6 +827,7 @@ export function startStampRelocate(e, CANVAS_DATA) {
   deactivateGears();
   resetLegendOperatorActivations();
   activateStampRelocateState();
+  changeCursorOnCanvas('stamp');
   const deleteContainer = document.getElementById(ELEMENT_IDS.deleteStamp);
   applyElementActivation(deleteContainer, ACTIVE_CLASSNAMES.deleteStamp);
 }
@@ -701,7 +892,7 @@ export function buildReselectOperatorToSelection(sideKey) {
     }
 
     operatorIconContainer.addEventListener('click', (e) => {
-      const isSelected = operatorIconContainer.firstElementChild.classList.contains('selected');
+      const isSelected = operatorIconContainer.firstElementChild.classList.contains('is-selected');
       const clickedIcon = e.currentTarget.lastElementChild;
       const index = SELECTED_OPERATORS[sideKey].findIndex(operator => operator.operatorName === clickedIcon.dataset.operatorSelection);
       if(isSelected) {
@@ -719,4 +910,191 @@ export function buildReselectOperatorToSelection(sideKey) {
       }
     })
   })
+}
+
+
+/*****JSON*****/
+/*****export*****/
+export async function executeFileSave(blob, fileName, fileTypeDesc, mimeType) {
+  if('showSaveFilePicker' in window && window.isSecureContext) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+          description: fileTypeDesc,
+          accept: { [mimeType]: [`.${fileName.split('.').pop()}`]}
+        }],    
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return true;
+    } catch (error) {
+      if(error.name === 'AbortError') return false;
+      console.warn('Modern save failed, falling back...', error);
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+  return true;
+}
+
+export async function saveTacticsJSON(CANVAS_DATA) {
+  const {selectedData} = CANVAS_DATA;
+  const jsonString = createExportJSONData(CANVAS_DATA, "json");
+  const fileName = generateFileName(
+    selectedData.map.mapName || "memo",
+    selectedData.floor ||"",
+    "json"
+  );
+
+  const blob = new Blob([jsonString], { type: "application/json" });
+  
+  return await executeFileSave(blob, fileName, 'JSON Files', 'application/json');
+}
+
+export async function saveTaciticsImageWithMetadata(CANVAS_DATA) {
+  const {selectedData, context} = CANVAS_DATA;
+  const jsonString = createExportJSONData(CANVAS_DATA, "image");
+  const fileName = generateFileName(
+    selectedData.map.mapName || "memo",
+    selectedData.floor || "",
+    "png"
+  );
+
+  try {
+    const imageBlob = await new Promise(resolve => context.main.el.toBlob(resolve, 'image/png'));
+    if(!imageBlob) throw new Error("Canvas blob creation failed");
+
+    const encoder = new TextEncoder();
+    const jsonUnit8 = encoder.encode(jsonString);
+    const identifier = "--R6SX-DATA-START--";
+
+    const conbinedBlob = new Blob([imageBlob, identifier, jsonUnit8], {type: 'image/png'});
+
+    return await executeFileSave(conbinedBlob, fileName, 'PNG Image', 'image/png');  
+  } catch (error) {
+    console.error('Image Export Error:', error);
+    alert('画像の書き出しに失敗しました。');
+    return false;
+  }
+}
+
+/*****import*****/
+export async function importJSONData(file) {
+  const textJa = '読み込んだマップの全フロアに描画を上書きしますか。';
+  const textEn = 'Overwrite all floors with the loaded map drawing?';
+
+  const isConfirmed = await showConfirmDialog(textJa, textEn);
+
+  if(!isConfirmed) return;
+
+  const data = await parseTacticsFile(file);
+  applyImportedData(data, CANVAS_DATA);
+
+  const modalElements = getModalElements(MODAL_IDS.file);
+  hideModal(modalElements.modal);
+}
+
+export async function importPNGData(file) {
+  const textJa = '読み込んだマップの該当するフロアに描画を上書きしますか。';
+  const textEn = 'Overwrite the relevant floors with the loaded map drawing?';
+
+  const isConfirmed = await showConfirmDialog(textJa, textEn);
+
+  if(!isConfirmed) return;
+
+  const data = await parseTacticsFile(file);
+  applyImportedData(data, CANVAS_DATA);
+
+  const modalElements = getModalElements(MODAL_IDS.file);
+  hideModal(modalElements.modal);
+}
+
+export async function pickTacticsFile() {
+  if('showOpenFilePicker' in window && window.isSecureContext) {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ 
+          description: 'Tactics Files (JSON/PNG)',
+          accept: {
+            'application/json': ['.json'],
+            'image/png': ['.png']
+          }
+        }],
+        multiple: false,
+      });
+      return await handle.getFile();
+    } catch (error) {
+      if (error.name === 'AbortError') return null;
+      throw error;
+    }
+  }
+
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json,.png,image/png';
+    input.onchange = () => resolve(input.files[0]);
+    input.click();
+  });
+}
+
+export async function extractMetadataFromImage(file) {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const decoder = new TextDecoder();
+    const content = decoder.decode(arrayBuffer);
+
+    const identifier = "--R6SX-DATA-START--";
+    const index = content.lastIndexOf(identifier);
+
+    if(index === -1) {
+      throw new Error('この画像には作戦データが含まれていません。');
+    }
+
+    const jsonString = content.slice(index + identifier.length);
+    return JSON.parse(jsonString);
+  } catch (error) {
+    throw new Error('画像の解析に失敗しました: ' + error.message);
+  }
+}
+
+export async function parseTacticsFile(file) {
+  if(!file) return null;
+
+  const isJSON = file.type === "application/json" || file.name.endsWith('.json');
+  const isPNG = file.type === "image/png" || file.name.endsWith('.png');
+
+  try {
+    let data;
+
+    if(isJSON) {
+      const text = await file.text();
+      data = JSON.parse(text);
+    } else if(isPNG) {
+      data = await extractMetadataFromImage(file);
+    } else {
+      alert("JSONまたはPNGファイルを選択してください。");
+      return null;
+    }
+
+    if(data.appName !== "R6SX-Briefing-Board") {
+      throw new Error('このアプリのデータではありません。');
+    }
+
+    return data;
+  } catch (error) {
+    alert('読み込みエラー:' + error.message);
+    return null;
+  }
 }

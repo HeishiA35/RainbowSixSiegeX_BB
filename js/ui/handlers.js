@@ -8,6 +8,7 @@ import {
   SELECTOR_DATA,
   MODAL_IDS,
   ELEMENT_IDS,
+  FORM_ID,
 } from "../data/selector.js";
 
 import {
@@ -25,21 +26,26 @@ import {
   setActivePointer,
   DRAW_STATE,
   TOUCH_STATE,
-  changeMapImageType,
   changeStampSize,
+  changeMapImageTypeState,
+  changeMapAngleState,
 } from "../logic/switcher.js";
 
 import {
   deleteSelectedGadget,
   replaceSelectedGadget,
   pushSelectedGadget,
+  getStampsAtPointer,
 } from "../logic/collection.js";
 
 import {
   adjustMapCenter,
   isRectColliding,
   getPointerLocalPositions,
-  updateCanvasScale
+  updateCanvasScale,
+  changeCanvasScale,
+  resizeCanvas,
+  initMapImageSize
 } from "../logic/calculator.js";
 
 import {
@@ -51,9 +57,10 @@ import {
   getOperatorIconFromSelection,
   getPlayerName,
   getPlayerColor,
-  getButtonElementsById,
+  getElementArrayById,
   identifyStampContainer,
   getModalElements,
+  getScaleValue,
 } from "./domExtractor.js";
 
 import {
@@ -77,6 +84,9 @@ import {
   displayCurrentFloorName,
   applyConfirmDialogMessage,
   toggleHistoryButtonActive,
+  applyScaleIntOptions,
+  applyScaleDecOptions,
+  initCompass,
 } from "./domApplier.js";
 
 import {
@@ -106,14 +116,31 @@ import {
   shiftHowToUsePage,
   switchInformation,
   initHowToUsePositions,
+  saveTacticsJSON,
+  saveTaciticsImageWithMetadata,
+  parseTacticsFile,
+  pickTacticsFile,
+  resetAllDrawnContents,
+  showConfirmDialog,
+  clearDrawnContents,
+  importJSONData,
+  importPNGData,
+  initScaleOptions,
+  spinCompassLeft,
+  spinCompassRight,
+  initSpinSettingOptions,
 } from "./controller.js";
 
 import {
+  applyImportedData,
   CANVAS_DATA,
+  changeMapAngle,
+  changeMapType,
   loadMapImage,
   rewriteFloorData,
   rewriteMapData,
 } from "./canvasManager.js";
+import { saveSettingToLocal } from "../logic/storage.js";
 /*****defaultBehaviors*****/
 
 export function handleDoubleTouch(e) {
@@ -136,7 +163,7 @@ export function handleDocumentClick(e) {
   const isGearsActive = gears.classList.contains(ACTIVE_CLASSNAMES.gear);
   const isOperatorItemActive = OPERATOR_STATE.isItemsOpen; 
 
-  if(!isGearsActive && !isOperatorItemActive) return; //gearsがdeactiveできない。
+  if(!isGearsActive && !isOperatorItemActive) return;
 
   let isContainerColliding = false;
 
@@ -177,12 +204,41 @@ export function handleHowToUseButtonClick(buttonId) {
 export function handleMapImageSettingChange(e) {
   const selectedMapImageType = e.target.value;
 
-  changeMapImageType(CANVAS_DATA, selectedMapImageType);
-  const newMapData = getMapDataFromPool(CANVAS_DATA.selectedData.map.mapName);
-  CANVAS_DATA.selectedData.map = newMapData;
-  loadMapImage(CANVAS_DATA);
-  updateStaticCanvasCache(CANVAS_DATA);
-  updateCanvas(CANVAS_DATA);
+  changeMapImageTypeState(CANVAS_DATA, selectedMapImageType);
+  changeMapType(CANVAS_DATA);
+}
+
+export function handleMapAngleSettingChange(e) {
+  const selectedMapAngle = e.target.value;
+
+  changeMapAngleState(CANVAS_DATA, selectedMapAngle);
+  changeMapAngle(CANVAS_DATA);
+  initCompass(CANVAS_DATA);
+
+}
+
+export function handleZoomScaleSettingChange(e, CANVAS_DATA) {
+  const {setting, state} = CANVAS_DATA;
+  const selectorData = e.target.dataset.scaleSetting;
+  const scaleValues = getScaleValue();
+  const isMinChanged = selectorData.startsWith('min');
+  const isMaxChanged = selectorData.startsWith('max');
+
+  initScaleOptions(scaleValues, selectorData, isMinChanged, isMaxChanged);
+
+  if(isMinChanged) {
+    setting.minScale = scaleValues.min;
+  } else if(isMaxChanged && scaleValues.max < 8) {
+    setting.maxScale = scaleValues.max;
+  } else if(isMaxChanged && scaleValues.max >= 8) {
+    setting.maxScale = 8;
+  }
+
+  if((state.currentImageScale < scaleValues.min) || (state.currentImageScale > scaleValues.max)) {
+    changeCanvasScale(CANVAS_DATA, isMinChanged, isMaxChanged);
+    updateStaticCanvasCache(CANVAS_DATA);
+    updateCanvas(CANVAS_DATA);
+  }
 }
 
 export function handleStampSizeSettingChange(e) {
@@ -191,6 +247,10 @@ export function handleStampSizeSettingChange(e) {
   changeStampSize(STAMP_STATE, stampSize);
   updateStaticCanvasCache(CANVAS_DATA);
   updateCanvas(CANVAS_DATA);
+}
+
+export function handleSettingSaveClick(CANVAS_DATA, STAMP_STATE) {
+  saveSettingToLocal(CANVAS_DATA, STAMP_STATE);
 }
 
 /****Left*****/
@@ -203,7 +263,7 @@ export function handleStampSizeSettingChange(e) {
  */
 export function handleToolClick(toolId, elements) {
   const classNameToActivate = ACTIVE_CLASSNAMES.tool;
-  const buttons = getButtonElementsById(BUTTON_IDS.tool);
+  const buttons = getElementArrayById(BUTTON_IDS.tool);
   toggleToolState(toolId);
   applyElementsDeactivation(buttons, classNameToActivate);
   applyElementActivation(elements.open, classNameToActivate);
@@ -213,57 +273,49 @@ export function handleToolClick(toolId, elements) {
   changeCursorOnCanvas(toolId)
 };
 
-export function handleLineClearClick() {
-  const modal = document.getElementById(MODAL_IDS.confirm);
+export async function handleLineClearClick(CANVAS_DATA, clearId) {
   const textJa = '描画した線をすべて削除しますか？';
   const textEn = 'Are you sure you want to delete all lines?';
 
-  applyConfirmDialogMessage(textJa, textEn);
-  showModal(modal);
+  const isConfirmed = await showConfirmDialog(textJa, textEn);
+
+  if(!isConfirmed) return;
+
+  clearDrawnContents(CANVAS_DATA, clearId);
+
+  const eraserSetting = document.getElementById(BUTTON_IDS.toolSetting.eraser);
+  hideModal(eraserSetting, ACTIVE_CLASSNAMES.tool);
 }
 
-export function handleStampClearClick() {
-  const modal = document.getElementById(MODAL_IDS.confirm);
+export async function handleStampClearClick(CANVAS_DATA, clearId) {
   const textJa = '描画したスタンプをすべて削除しますか？';
   const textEn = 'Are you sure you want to delete all stamps?';
 
-  applyConfirmDialogMessage(textJa, textEn);
-  showModal(modal);
+  const isConfirmed = await showConfirmDialog(textJa, textEn);
+
+  if(!isConfirmed) return;
+
+  clearDrawnContents(CANVAS_DATA, clearId);
+
+  const eraserSetting = document.getElementById(BUTTON_IDS.toolSetting.eraser);
+  hideModal(eraserSetting, ACTIVE_CLASSNAMES.tool);
 }
 
-export function handleAllClearClick() {
-  const modal = document.getElementById(MODAL_IDS.confirm);
+export async function handleAllClearClick(CANVAS_DATA, clearId) {
   const textJa = 'すべての描画(線とスタンプ)を消去しますか？';
   const textEn = 'Are you sure you want to clear everything?';
 
-  applyConfirmDialogMessage(textJa, textEn);
-  showModal(modal);
-}
+  const isConfirmed = await showConfirmDialog(textJa, textEn);
 
-export function handleCancelClick() {
-  const modal = document.getElementById(MODAL_IDS.confirm);
-  hideModal(modal);
-}
+  if(!isConfirmed) return;
 
-export function handleOkClick(clearId, CANVAS_DATA) {
-  const {selectedData, drawnContents} = CANVAS_DATA;
-  const confirmModal = document.getElementById(MODAL_IDS.confirm);
+  clearDrawnContents(CANVAS_DATA, clearId);
+
   const eraserSetting = document.getElementById(BUTTON_IDS.toolSetting.eraser);
-  hideModal(confirmModal);
   hideModal(eraserSetting, ACTIVE_CLASSNAMES.tool);
-
-  if(clearId === 'lineClear') {
-    drawnContents.lines[selectedData.floor] = [];
-  } else if (clearId === 'stampClear') {
-    drawnContents.stamps[selectedData.floor] = [];
-  } else if(clearId === 'allClear') {
-    drawnContents.lines[selectedData.floor] = [];
-    drawnContents.stamps[selectedData.floor] = [];
-  }
-
-  updateStaticCanvasCache(CANVAS_DATA);
-  updateCanvas(CANVAS_DATA);
 }
+
+
 /****LegendInLeftBar*****/
 /**
  * ボールド設定ボタンのハンドル。選択したボールド設定をアクティブ化。
@@ -305,25 +357,61 @@ export function handleHistoryButton(buttonId, CANVAS_DATA) {
   }
 }
 
+export function handleSpinButtonClick(buttonId, CANVAS_DATA) {
+  if(buttonId === 'left') {
+    spinCompassLeft(buttonId, CANVAS_DATA);
+  } else if(buttonId === 'right') {
+    spinCompassRight(buttonId, CANVAS_DATA);
+  }
+
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
+
+  initSpinSettingOptions(CANVAS_DATA);
+}
+
 export function handleMapZoomWheelSpin(e) {
-    const {setting, state} = CANVAS_DATA;
+    const {state, context} = CANVAS_DATA;
   const wheelDelta = e.deltaY ? - (e.deltaY) : e.wheelDelta;
   //memo:e.deltaYが存在すればe.deltaYの符号を逆転した値が定義。
   //memo:e.deltaYが存在しなければe.wheelDeltaYが定義。(ブラウザ互換性対応)
 
   const isZoomUp = wheelDelta > 0;
   const isZoomDown = !isZoomUp;
-  const pointerPositionsAtCanvas = getPointerLocalPositions(e);
+  let pos = getPointerLocalPositions(e);
 
-  updateCanvasScale(CANVAS_DATA, pointerPositionsAtCanvas, isZoomUp, isZoomDown);
+  const centerX = context.container.clientWidth / 2;
+  const centerY = context.container.clientHeight / 2;
 
-  if(state.currentImageScale === setting.minScale) {
+  let relX = pos.vX - centerX;
+  let relY = pos.vY - centerY;
+
+  if(state.angleIndex !== 0) {
+    const angle = (state.angleIndex * 90 * Math.PI) / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const unRotatedX = relX * cos + relY * sin; 
+    const unRotatedY = -relX * sin + relY * cos;
+
+    relX = unRotatedX;
+    relY = unRotatedY;
+  }
+  
+  const adjustedPos = {
+    vX: relX,
+    vY: relY
+  };
+  
+  updateCanvasScale(CANVAS_DATA, adjustedPos, isZoomUp, isZoomDown);
+
+  if(state.currentImageScale === 1) {
     adjustMapCenter(CANVAS_DATA);
   }
 }
 
 export function handleZoomButtonClick(buttonId) {
-  const {context, setting, state} = CANVAS_DATA;
+  const {context, state} = CANVAS_DATA;
   const container = context.container;
   const isZoomUp = buttonId === Object.keys(BUTTON_IDS.zoom)[0];
   const isZoomDown = buttonId === Object.keys(BUTTON_IDS.zoom)[1];
@@ -334,7 +422,7 @@ export function handleZoomButtonClick(buttonId) {
 
   updateCanvasScale(CANVAS_DATA, center, isZoomUp, isZoomDown);
 
-  if(state.currentImageScale === setting.minScale) {
+  if(state.currentImageScale === 1) {
     adjustMapCenter(CANVAS_DATA);
   }
 }
@@ -432,7 +520,7 @@ export const handleOperatorButtonInLegendClick = (button) => {
   
   if(OPERATOR_STATE.isOperatorActive) {
     applyElementActivation(operatorContainer, ACTIVE_CLASSNAMES.operator);
-    //console.log(playerColor); //TODO:ここで、rgbで出力される。16進数コードで出力されていないので、エラーの元かも。注意。
+    changeCursorOnCanvas(operatorId);
     updatePlayerColorState(playerColor);
   }
 
@@ -626,6 +714,7 @@ export function handleStampImagePointerDown(e) {
   resetToolSelections();
   resetLegendOperatorActivations();
   activateStampLocateState();
+  changeCursorOnCanvas('stamp');
   const deleteContainer = document.getElementById(ELEMENT_IDS.deleteStamp);
   applyElementActivation(deleteContainer, ACTIVE_CLASSNAMES.deleteStamp);
 }
@@ -685,7 +774,7 @@ export function handleMapClick(e, CANVAS_DATA) {
   rewriteFloorData(CANVAS_DATA);
   displayCurrentMapName(mapName);
   loadMapImage(CANVAS_DATA);
-  //CanvasのAllclear
+  resetAllDrawnContents(CANVAS_DATA);
   updateStaticCanvasCache(CANVAS_DATA);
   updateCanvas(CANVAS_DATA);
 
@@ -708,3 +797,78 @@ export function handleFloorClick(e, CANVAS_DATA) {
   const modalElements = getModalElements(MODAL_IDS.floorSetting);
   hideModal(modalElements.modal);
 }
+
+/*****file*****/
+
+/*****export*****/
+export async function handleProgramButtonClick(CANVAS_DATA) {
+  const isSuccess = await saveTacticsJSON(CANVAS_DATA);
+  
+  if(isSuccess) {
+    const modalElements = getModalElements(MODAL_IDS.file);
+    hideModal(modalElements.modal);
+  }
+}
+
+export async function handleImageButtonClick(CANVAS_DATA) {
+  const isSuccess  = await saveTaciticsImageWithMetadata(CANVAS_DATA);
+
+  if(isSuccess) {
+    const modalElements = getModalElements(MODAL_IDS.file);
+    hideModal(modalElements.modal);
+  }
+}
+
+/*****import*****/
+export async function handleImportClick(CANVAS_DATA) {
+  const file = await pickTacticsFile();
+
+  if(!file) return;
+
+  const isJSON = file.type === "application/json" || file.name.endsWith('.json');
+  const isPNG = file.type === "image/png" || file.name.endsWith('.png');
+  
+  if(isJSON) {
+    importJSONData(file);
+  } else if(isPNG) {
+    importPNGData(file);
+  }
+}
+
+export function setupDragAndDrop(dropZoneElement, CANVAS_DATA) {
+  const preventDefaults = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZoneElement.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZoneElement.addEventListener(eventName, () => {
+      dropZoneElement.classList.add(ACTIVE_CLASSNAMES.file);
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZoneElement.addEventListener(eventName, () => {
+      dropZoneElement.classList.remove(ACTIVE_CLASSNAMES.file);
+    }, false);
+  });
+
+  dropZoneElement.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    if(file) {
+      const isJSON = file.type === "application/json" || file.name.endsWith('.json');
+      const isPNG = file.type === "image/png" || file.name.endsWith('.png'); 
+
+      if(isJSON) {
+        importJSONData(file);
+      } else if(isPNG) {
+        importPNGData(file);
+      }
+    }
+  });
+}
+

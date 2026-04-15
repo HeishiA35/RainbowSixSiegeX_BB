@@ -18,6 +18,7 @@ import {
 import {
   createFirstVisitChecker,
   getMapFromSession,
+  getSettingFromLocal,
 } from "../logic/storage.js";
 
 import {
@@ -34,12 +35,13 @@ import {
   TOOL_STATE,
   TOUCH_STATE,
   DRAW_STATE,
+  STAMP_STATE,
 } from "../logic/switcher.js";
 
 import {
   getLegendContents,
   getModalElements,
-  getButtonElementsById,
+  getElementArrayById,
   initCanvasContext,
 } from "../ui/domExtractor.js";
 
@@ -55,6 +57,9 @@ import {
   hideFooter,
   applyCurrentColor,
   applyCurrentOpacity,
+  changeCursorOnCanvas,
+  initSettingOptions,
+  initCompass,
 } from "../ui/domApplier.js";
 
 import {
@@ -72,6 +77,8 @@ import {
   resetLegendOperatorActivations,
   initHowToUsePositions,
   switchInformation,
+  saveHistory,
+  applyLoadedSettings,
 } from "../ui/controller.js";
 
 import {
@@ -95,8 +102,6 @@ import {
   handleMapClick,
   handleFloorClick,
   handleLineClearClick,
-  handleCancelClick,
-  handleOkClick,
   handleStampClearClick,
   handleAllClearClick,
   handleHistoryButton,
@@ -106,10 +111,19 @@ import {
   handleMapImageSettingChange,
   handleStampSizeSettingChange,
   handleItemCloseClick,
+  handleProgramButtonClick,
+  handleImageButtonClick,
+  handleImportClick,
+  setupDragAndDrop,
+  handleZoomScaleSettingChange,
+  handleSettingSaveClick,
+  handleSpinButtonClick,
+  handleMapAngleSettingChange,
 } from "../ui/handlers.js";
 
 import {
   CANVAS_DATA,
+  changeMapType,
   loadMapImage,
 } from "../ui/canvasManager.js";
 
@@ -136,7 +150,10 @@ function setupDefaultBehaviors() {
     updateStaticCanvasCache(CANVAS_DATA);
     updateCanvas(CANVAS_DATA);
     initHowToUsePositions();
-  })
+  });
+
+  changeCursorOnCanvas('move');
+  
 }
 
 /**
@@ -174,6 +191,19 @@ function loadSelectedOperators() {
   });
 };
 
+/**
+ * 設定項目のロード
+ */
+function loadSetting() {
+  const settings = getSettingFromLocal();
+  if(settings) {
+    applyLoadedSettings(settings, CANVAS_DATA, STAMP_STATE);
+    initSettingOptions(settings);
+    changeMapType(CANVAS_DATA);
+    initCompass(CANVAS_DATA);
+  }
+}
+
 
 /*****menu*****/
 /**
@@ -183,31 +213,58 @@ function initMenu() {
   const modalId = MODAL_IDS.menu;
   const classNameToActivate = ACTIVE_CLASSNAMES.menu;
 
-  initOpenModal(modalId, classNameToActivate);
+  initOpenModal({
+    modalId: modalId,
+    classNameToActivate: classNameToActivate
+  });
   initCloseModal(modalId, classNameToActivate);
 };
 
 
 /**
- * セッティング開閉の初期設定
+ * セッティングの初期設定
  */
 function initSetting() {
   const modalId = MODAL_IDS.setting;
+  const otherOpenId = BUTTON_IDS.setting.open;
   const modalIdToClose = MODAL_IDS.menu;
   const classNameToActivateForClosing = ACTIVE_CLASSNAMES.menu;
 
-  initOpenModal (modalId);
+  initOpenModal ({
+    modalId: modalId,
+    otherOpenId: otherOpenId,
+  });
   initClosePreModal(modalId, modalIdToClose, classNameToActivateForClosing);
   initCloseModal(modalId);
 
   const mapImageSetting = document.getElementById(FORM_ID.mapImage);
   mapImageSetting.addEventListener('change', (e) => {
     handleMapImageSettingChange(e);
+  });
+
+  const mapSpinSetting = document.getElementById(FORM_ID.spin);
+  mapSpinSetting.addEventListener('change', (e) => {
+    handleMapAngleSettingChange(e);
   })
 
-  const stampSetting = document.getElementById(FORM_ID.stampSise);
+  const zoomScaleSettings = getElementArrayById(FORM_ID.zoomScale);
+  zoomScaleSettings.forEach(zoomScale => {
+    zoomScale.addEventListener('change', (e) => {
+      handleZoomScaleSettingChange(e, CANVAS_DATA);
+    });
+  });
+
+  const stampSetting = document.getElementById(FORM_ID.stampSize);
   stampSetting.addEventListener('change', (e) => {
     handleStampSizeSettingChange(e);
+  });
+
+  const saveButton = document.getElementById(BUTTON_IDS.setting.save);
+  saveButton.addEventListener('click', () => {
+    handleSettingSaveClick(CANVAS_DATA, STAMP_STATE);
+
+    const modals = getModalElements(modalId)
+    hideModal(modals.modal);
   })
 };
 
@@ -220,7 +277,10 @@ function setupHowToUse() {
   const modalIdToClose = MODAL_IDS.menu;
   const classNameToActivateForClosing = ACTIVE_CLASSNAMES.menu;
 
-  initOpenModal (modalId, classNameToActivate);
+  initOpenModal ({
+    modalId: modalId,
+    classNameToActivate: classNameToActivate
+  });
   initClosePreModal(modalId, modalIdToClose, classNameToActivateForClosing);
   initCloseModal(modalId, classNameToActivate);
 
@@ -236,7 +296,7 @@ function setupHowToUse() {
     resetLegendOperatorActivations();
   });
 
-  const buttons = getButtonElementsById(BUTTON_IDS.howToUse);
+  const buttons = getElementArrayById(BUTTON_IDS.howToUse);
   buttons.forEach(button => {
     button.addEventListener('click', () => {
       const buttonId = button.dataset.howToUse;
@@ -268,7 +328,7 @@ function initWhatsSite() {
     hideModal(modalElements.modal);
   })
 
-  initOpenModal(modalId);
+  initOpenModal({modalId: modalId});
   initCloseModal(modalId);
 };
 
@@ -277,7 +337,7 @@ function initWhatsSite() {
 /*****tools*****/
 
 function initTools() {
-  const toolButtons = getButtonElementsById(BUTTON_IDS.tool);
+  const toolButtons = getElementArrayById(BUTTON_IDS.tool);
 
   toolButtons.forEach(button => {
     const toolId = button.dataset.tool;
@@ -341,55 +401,33 @@ function initToolSettings() {
   const lineClearButton = document.getElementById(ELEMENT_IDS.tool.clear.line);
   lineClearButton.addEventListener('click', () => {
     const clearId = lineClearButton.dataset.draw;
-    handleLineClearClick();
-    initConfirmDialogButton(clearId, CANVAS_DATA);
+    handleLineClearClick(CANVAS_DATA, clearId);
   });
-
+  
   const stampClearButton = document.getElementById(ELEMENT_IDS.tool.clear.stamp);
   stampClearButton.addEventListener('click', () => {
     const clearId = stampClearButton.dataset.draw;
-    handleStampClearClick();
-    initConfirmDialogButton(clearId, CANVAS_DATA);
+    handleStampClearClick(CANVAS_DATA, clearId);
   });
   
   const allClearButton = document.getElementById(ELEMENT_IDS.tool.clear.all);
   allClearButton.addEventListener('click', () => {
     const clearId = allClearButton.dataset.draw;
-    handleAllClearClick();
-    initConfirmDialogButton(clearId, CANVAS_DATA);
-  });
-
-}
-
-function initConfirmDialogButton(clearId, CANVAS_DATA) {
-  const cancelButton = document.getElementById(BUTTON_IDS.confirm.cancel);
-  const newCancelButton = cancelButton.cloneNode(true);
-  const okButton = document.getElementById(BUTTON_IDS.confirm.ok);
-  const newOkButton = okButton.cloneNode(true);
-
-  cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
-  okButton.parentNode.replaceChild(newOkButton, okButton);
-
-  newCancelButton.addEventListener('click', () => {
-    handleCancelClick()
-  });
-
-  newOkButton.addEventListener('click', () => {
-    handleOkClick(clearId, CANVAS_DATA)
+    handleAllClearClick(CANVAS_DATA, clearId);
   });
 }
+
 
 /*****canvas*****/
-
-
 function buildCanvas() {
   const {context} = CANVAS_DATA;
   const {main} = context;
   initCanvasContext();
   resizeCanvas(CANVAS_DATA);
   loadMapImage(CANVAS_DATA);
+  saveHistory(CANVAS_DATA);
 
-  const zoomButtons = getButtonElementsById(BUTTON_IDS.zoom);
+  const zoomButtons = getElementArrayById(BUTTON_IDS.zoom);
 
   zoomButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -401,13 +439,20 @@ function buildCanvas() {
     });
   });
 
-
-  const historyButtons = getButtonElementsById(BUTTON_IDS.history);
+  const historyButtons = getElementArrayById(BUTTON_IDS.history);
   historyButtons.forEach(button => {
     button.addEventListener('click', () => {
       const buttonId = button.dataset.history;
       handleHistoryButton(buttonId, CANVAS_DATA);
     })
+  });
+
+  const spinButtons = getElementArrayById(BUTTON_IDS.spin);
+  spinButtons.forEach(spinButton => {
+    spinButton.addEventListener('click', () => {
+      const buttonId = spinButton.dataset.spin;
+      handleSpinButtonClick(buttonId, CANVAS_DATA);
+    });
   });
 
   main.el.addEventListener('wheel', (e) => {
@@ -440,7 +485,6 @@ function buildCanvas() {
   })
 
   main.el.addEventListener('pointermove', (e) => {
-    //console.log(TOUCH_STATE.press);
     setActivePointer(e);
     handleCanvasPointerMove(e, TOOL_STATE, TOUCH_STATE, CANVAS_DATA);
     updateStaticCanvasCache(CANVAS_DATA);
@@ -503,7 +547,7 @@ function setupLegend() {
 function initOperatorSetting () {
   const modalId = MODAL_IDS.operatorSetting;
 
-  initOpenModal(modalId);
+  initOpenModal({modalId: modalId});
   initCloseModal(modalId);
 };
 
@@ -511,7 +555,7 @@ function initOperatorSetting () {
 function initOperatorSelections() {
   Object.keys(SELECTED_OPERATORS).forEach(sideKey => {
     const modalId = MODAL_IDS.operatorSelection[sideKey];
-    initOpenModal(modalId);
+    initOpenModal({modalId: modalId});
     initCloseModal(modalId);
 
     buildSelectedOperatorToSelection(sideKey); //HACK: ここ汚いので、余裕があれば整理。
@@ -526,7 +570,7 @@ function initOperatorSelections() {
 
 function initStampCollection() {
   const modalId = MODAL_IDS.stampCollection;
-  initOpenModal(modalId);
+  initOpenModal({modalId: modalId});
   initCloseModal(modalId);
 }
 
@@ -545,7 +589,7 @@ function initStampBehavior() {
 
 function initMapSelection() {
   const modalId = MODAL_IDS.mapSetting;
-  initOpenModal(modalId);
+  initOpenModal({modalId: modalId});
   initCloseModal(modalId);
 
   const maps = document.querySelectorAll(SELECTOR_CLASSNAMES.map);
@@ -558,7 +602,7 @@ function initMapSelection() {
 
 function initFloorSetting() {
   const modalId = MODAL_IDS.floorSetting;
-  initOpenModal(modalId);
+  initOpenModal({modalId: modalId});
   initCloseModal(modalId);
 
   const floorContainers = document.querySelectorAll(SELECTOR_CLASSNAMES.floor);
@@ -569,6 +613,28 @@ function initFloorSetting() {
   })
 }
 
+function initFileManager() {
+  const modalId = MODAL_IDS.file;
+  initOpenModal({modalId: modalId});
+  initCloseModal(modalId);
+
+  const programButton = document.getElementById(BUTTON_IDS.file.program);
+  programButton.addEventListener('click', () => {
+    handleProgramButtonClick(CANVAS_DATA);
+  });
+
+  const imageButton = document.getElementById(BUTTON_IDS.file.image);
+  imageButton.addEventListener('click', () => {
+    handleImageButtonClick(CANVAS_DATA);
+  })
+
+  const importButton = document.getElementById(BUTTON_IDS.file.import);
+  importButton.addEventListener('click', () => {
+    handleImportClick(CANVAS_DATA);
+  });
+
+  setupDragAndDrop(importButton, CANVAS_DATA);
+}
 
 
 function initModals() {
@@ -584,6 +650,7 @@ function initModals() {
   //memo: マップ
   initMapSelection();
   initFloorSetting();
+  initFileManager();
 };
 
 setupDefaultBehaviors();
@@ -595,4 +662,5 @@ initTools();
 initToolSettings();
 setupLegend();
 buildCanvas();
+loadSetting();
 initStampBehavior();

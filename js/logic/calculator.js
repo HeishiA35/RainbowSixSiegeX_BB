@@ -99,8 +99,8 @@ export function isStampColliding(stampHitbox, pointerCenter, pointerRadius) {
  * @returns {boolean} - 線分が消しゴムの円内に入っていればtrue
  */
 export function isLineColliding(logicalPoint1, logicalPoint2, eraserCenter, eraserRadius) {
-  const localPoint1 = logicalToViewport(logicalPoint1.lX, logicalPoint1.lY);
-  const localPoint2 = logicalToViewport(logicalPoint2.lX, logicalPoint2.lY);
+  const localPoint1 = logicalToViewport(logicalPoint1.lX, logicalPoint1.lY, CANVAS_DATA);
+  const localPoint2 = logicalToViewport(logicalPoint2.lX, logicalPoint2.lY, CANVAS_DATA);
   const distSquared1 = Math.pow(localPoint1.vX - eraserCenter.vX, 2) + Math.pow(localPoint1.vY - eraserCenter.vY, 2);
   const distSquared2 = Math.pow(localPoint2.vX - eraserCenter.vX, 2) + Math.pow(localPoint2.vY - eraserCenter.vY, 2);
   const radiusSquared = Math.pow(eraserRadius, 2);
@@ -134,18 +134,33 @@ export function isLineColliding(logicalPoint1, logicalPoint2, eraserCenter, eras
  * @param {Number} vY - viewportにおけるY座標
  * @returns {logicalPositions} - 変換後の論理座標 
  */
-export function viewportToLogical(vX, vY) {
-  const {initialLogicalDraw, translate, currentImageScale} = CANVAS_DATA.state;
-  const drawX = vX - translate.vX;
-  const drawY = vY - translate.vY;
+export function viewportToLogical(vX, vY, CANVAS_DATA) {
+  const {state, context } = CANVAS_DATA;
 
-  const scaledX = drawX / currentImageScale;
-  const scaledY = drawY / currentImageScale;
+  const centerX = context.container.clientWidth / 2;
+  const centerY = context.container.clientHeight / 2;
 
-  const lX = scaledX / initialLogicalDraw.width;
-  const lY = scaledY / initialLogicalDraw.height;
+  let relX = vX - centerX;
+  let relY = vY - centerY;
 
-  return {lX: lX, lY: lY};
+  if(state.angleIndex !== 0) {
+    const angle = (state.angleIndex * 90 * Math.PI) / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const unRotatedX = relX * cos + relY * sin;
+    const unRotatedY = -relX * sin + relY * cos;
+    relX = unRotatedX;
+    relY = unRotatedY;
+  }
+
+  const destWidth = state.initialLogicalDraw.width * state.currentImageScale;
+  const destHeight = state.initialLogicalDraw.height * state.currentImageScale;
+
+  const lX = (relX - state.translate.vX) / destWidth + 0.5;
+  const lY = (relY - state.translate.vY) / destHeight + 0.5;
+
+  return {lX, lY};
 }
 
 /**
@@ -154,18 +169,33 @@ export function viewportToLogical(vX, vY) {
  * @param {Number} lY - 論理Y座標
  * @returns {viewportPositions} - 変換後のviewport座標
  */
-export function logicalToViewport(lX, lY) {
-  const {initialLogicalDraw, translate, currentImageScale} = CANVAS_DATA.state;
-  const scaledX = lX * initialLogicalDraw.width;
-  const scaledY = lY * initialLogicalDraw.height;
+export function logicalToViewport(lX, lY, CANVAS_DATA, ignoreRotation = false) {
+  const {state, context} = CANVAS_DATA;
+  
+  const centerX = context.container.clientWidth / 2;
+  const centerY = context.container.clientHeight / 2;
 
-  const drawX = scaledX * currentImageScale;
-  const drawY = scaledY * currentImageScale;
+  const destWidth = state.initialLogicalDraw.width * state.currentImageScale;
+  const destHeight = state.initialLogicalDraw.height * state.currentImageScale;
 
-  const vX = drawX + translate.vX;
-  const vY = drawY + translate.vY;
+  let vX = (lX - 0.5) * destWidth + state.translate.vX;
+  let vY = (lY - 0.5) * destHeight + state.translate.vY;
 
-  return {vX: vX, vY: vY};
+  if(state.angleIndex !== 0 && !ignoreRotation) {
+    const angle =(state.angleIndex * 90 * Math.PI) / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const rotatedX = vX * cos - vY * sin;
+    const rotatedY = vX * sin + vY * cos;
+    vX = rotatedX;
+    vY = rotatedY;
+  }
+
+  return {
+    vX: vX + centerX,
+    vY: vY + centerY
+  };
 }
 
 
@@ -219,9 +249,6 @@ export function resizeCanvas({context}) {
 
   main.ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
   cache.ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
-  
-  main.ctx.imageSmoothingEnabled = false;
-  cache.ctx.imageSmoothingEnabled = false;
 };
 
 
@@ -257,18 +284,42 @@ export function calculateMapImageSize({context}) {
  * @param {import("../ui/canvasManager.js").FullCanvasDataStructure} CANVAS_DATA 
  */
 export function initMapImageSize(CANVAS_DATA) {
-  const {context, state} = CANVAS_DATA;
+  const {context, state, setting} = CANVAS_DATA;
   const {mapDrawWidth, mapDrawHeight} = calculateMapImageSize(CANVAS_DATA);
 
   state.initialLogicalDraw.width = mapDrawWidth;
   state.initialLogicalDraw.height = mapDrawHeight;
-  state.translate.vX = (context.container.clientWidth  - state.initialLogicalDraw.width)  / 2;
-  state.translate.vY = (context.container.clientHeight - state.initialLogicalDraw.height) / 2;
-  state.currentImageScale = 1;
-  state.imageScaleIndex = 0;
+  
+  state.currentImageScale = setting.minScale;
+  state.imageScaleIndex = Math.round((state.currentImageScale -1) / setting.scaleStep);
 }
 
 /*****zoom*****/
+
+export function changeCanvasScale(CANVAS_DATA, isMinChanged = true, isMaxChanged = false) {
+  const {context, setting, state} = CANVAS_DATA;
+  let nextScale;
+
+  if(isMinChanged) {
+    nextScale = setting.minScale;
+  } else if (isMaxChanged) {
+    nextScale = setting.maxScale;
+  }
+
+  const scaleRatio = nextScale / state.currentImageScale;
+  const center = {
+    vX: context.container.clientWidth  / 2,
+    vY: context.container.clientHeight / 2
+  };
+
+  let nextTranslateX = center.vX - (center.vX - state.translate.vX) * scaleRatio;
+  let nextTranslateY = center.vY - (center.vY - state.translate.vY) * scaleRatio;
+
+  state.currentImageScale = nextScale;
+  state.imageScaleIndex = Math.round((state.currentImageScale -1) / setting.scaleStep);
+  state.translate.vX = nextTranslateX;
+  state.translate.vY = nextTranslateY;
+};
 
 /**
  * 拡大/縮小を実行するため、CANVAS_DATAの値を更新する
@@ -278,8 +329,8 @@ export function initMapImageSize(CANVAS_DATA) {
  * @param {boolean} isZoomDown - 縮小を実行する場合true
  * @returns {void}
  */
-export function updateCanvasScale(CANVAS_DATA, positions, isZoomUp, isZoomDown ) {
-  const {context, setting, state} = CANVAS_DATA;
+export function updateCanvasScale(CANVAS_DATA, positions, isZoomUp, isZoomDown) {
+  const {setting, state} = CANVAS_DATA;
   let nextScale;
   
   if(isZoomUp) { //memo: 拡大
@@ -288,8 +339,8 @@ export function updateCanvasScale(CANVAS_DATA, positions, isZoomUp, isZoomDown )
     nextScale = Math.max(setting.minScale, state.currentImageScale - setting.scaleStep);
   }
 
-  if(isZoomUp && state.imageScaleIndex >= setting.maxScale * 5) return;
-  if(isZoomDown && state.imageScaleIndex <= 0) return;
+  if(isZoomUp && state.currentImageScale >= setting.maxScale) return;
+  if(isZoomDown && state.currentImageScale <= setting.minScale) return;
 
   const scaleRatio = nextScale / state.currentImageScale;
 
@@ -308,8 +359,10 @@ export function updateCanvasScale(CANVAS_DATA, positions, isZoomUp, isZoomDown )
  */
 export function adjustMapCenter(CANVAS_DATA) {
   const {context, state} = CANVAS_DATA;
-  state.translate.vX = (context.container.clientWidth - state.initialLogicalDraw.width)  / 2;
-  state.translate.vY = (context.container.clientHeight - state.initialLogicalDraw.height) / 2;
+  state.translate.vX = 0;
+  state.translate.vY = 0;
+  state.translateBuf.vX = 0;
+  state.translateBuf.vY = 0; 
 }
 
 
@@ -323,7 +376,7 @@ export function adjustMapCenter(CANVAS_DATA) {
 export function getStampHitbox(drawnStamp) {
   const stampSizePx = window.innerWidth * STAMP_STATE.size / 100;
   const halfStampSize = stampSizePx / 2;
-  const stampPoints = logicalToViewport(drawnStamp.points.lX, drawnStamp.points.lY);
+  const stampPoints = logicalToViewport(drawnStamp.points.lX, drawnStamp.points.lY, CANVAS_DATA);
   const stampHitbox = {}
 
   stampHitbox.vX = stampPoints.vX - halfStampSize;

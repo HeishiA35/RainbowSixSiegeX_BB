@@ -77,8 +77,12 @@ export function resetActivePointer(e) {
 }
 
 /*****setting*****/
-export function changeMapImageType({selectedData}, selectedMapImageType) {
+export function changeMapImageTypeState({selectedData}, selectedMapImageType) {
   selectedData.mapType = selectedMapImageType;
+}
+
+export function changeMapAngleState({state, setting}, selectedMapAngle) {
+  state.angleIndex = selectedMapAngle;
 }
 
 export function changeStampSize(STAMP_STATE, stampSize) {
@@ -139,9 +143,8 @@ export function changeBoldState(button, settingId) {
   if(settingId === TOOL_IDS.pen) {
     DRAW_STATE.penBoldValue = boldValue;
   } else {
-    DRAW_STATE.penBoldValue = boldValue;
+    DRAW_STATE.eraserBoldValue = boldValue;
   }
-  //console.log(boldValue);
 }
 
 export function changeColor(colorValue) {

@@ -90,6 +90,7 @@ export function getCachedImage(src, callback) {
   }
 
   const img = new Image();
+  img.crossOrigin = "anonymous";
 
   img.onload = () => {
     if(callback) callback();
@@ -133,5 +134,31 @@ export const createFirstVisitChecker = (modalId) => {
     } else {
       console.log('2回目以降のアクセス');
     }
+  }
+}
+
+
+export function saveSettingToLocal(CANVAS_DATA, STAMP_STATE) {
+  const {selectedData, state, setting} = CANVAS_DATA;
+
+  const settings = {
+    mapImageType: selectedData.mapType,
+    spinAngle: state.angleIndex,
+    maxScale: setting.maxScale,
+    minScale: setting.minScale,
+    stampSize: STAMP_STATE.size,
+  };
+
+  localStorage.setItem('R6XBB_setting', JSON.stringify(settings));
+}
+
+export function getSettingFromLocal() {
+  const savedData = localStorage.getItem('R6XBB_setting');
+
+  if(savedData) {
+    const settings = JSON.parse(savedData);
+    return settings;
+  } else {
+    console.log('保存された設定はありません。');
   }
 }

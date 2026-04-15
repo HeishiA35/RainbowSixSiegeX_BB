@@ -1,6 +1,8 @@
 import { initMapImageSize } from "../logic/calculator.js";
 import { getMapDataFromPool } from "../logic/factory.js";
-import { saveHistory, updateCanvas, updateStaticCanvasCache } from "./controller.js";
+import { saveMapToSession } from "../logic/storage.js";
+import { resetAllDrawnContents, saveHistory, updateCanvas, updateStaticCanvasCache } from "./controller.js";
+import { applySelectedMap, displayCurrentFloorName, displayCurrentMapName, displayExistedFloors } from "./domApplier.js";
 import { initCanvasContext } from "./domExtractor.js";
 
 /**
@@ -46,6 +48,7 @@ import { initCanvasContext } from "./domExtractor.js";
  * @property {import("../logic/calculator.js").viewportPositions} translateBuf - 移動量のバッファ
  * @property {number} currentImageScale - 現在の倍率
  * @property {number} imageScaleIndex - 倍率のインデックス
+ * @property {number} angle - 角度のインデックス
  * @property {TempDrawData} tempDraw - 描画中の一時データ
  * @property {Object} history - 履歴の管理データ
  * @property {any[]} history.stack - 操作時点での線とスタンプのデータ
@@ -95,7 +98,8 @@ export const CANVAS_DATA = {
     mapImage: new Image(),
   },
 
-  setting: { 
+  setting: {
+    spinAngle: 0,
     maxScale: 8.0,
     minScale: 1.0,
     scaleStep: 0.2
@@ -116,6 +120,7 @@ export const CANVAS_DATA = {
     },
     currentImageScale: 1,
     imageScaleIndex: 0,
+    angleIndex: 0,
     tempDraw: {
       linePoints: [],
       imageCache: {},
@@ -155,13 +160,13 @@ export function loadMapImage(CANVAS_DATA) {
   const {selectedData, context} = CANVAS_DATA;
   const mapData = selectedData.map ? selectedData.map.blueprint[selectedData.floor] : ''; 
   if(!mapData) return; //memo:URLがない場合は処理しない
+  context.mapImage.crossOrigin = "anonymous";
   context.mapImage.src = mapData;
 
   context.mapImage.onload = () => {
     initMapImageSize(CANVAS_DATA);
     updateStaticCanvasCache(CANVAS_DATA);
     updateCanvas(CANVAS_DATA);
-    saveHistory(CANVAS_DATA);
   };
 }
 
@@ -172,8 +177,60 @@ export function rewriteMapData({selectedData}, mapName) {
   window.sessionStorage.setItem('SELECTED_MAP_NAME', mapName);
 }
 
+export function changeMapType(CANVAS_DATA) {
+  const newMapData = getMapDataFromPool(CANVAS_DATA.selectedData.map.mapName);
+  CANVAS_DATA.selectedData.map = newMapData;
+  loadMapImage(CANVAS_DATA);
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
+}
+
+export function changeMapAngle(CANVAS_DATA) {
+  
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
+}
+
 /*****floor*****/
 export function rewriteFloorData({selectedData}, floorName = 'floor1st') {
   selectedData.floor = floorName;
   window.sessionStorage.setItem('SELECTED_FLOOR', floorName);
+}
+
+/*****import*****/
+export function applyImportedData(data, CANVAS_DATA) {
+  if(!data) return;
+
+  const {selectedData, drawnContents} = CANVAS_DATA;
+  
+  if(data.map.mapName !== selectedData.map.mapName) {
+    resetAllDrawnContents(CANVAS_DATA);
+  }
+
+  if(data.floor !== undefined) {
+    const targetFloor = data.floor;
+    CANVAS_DATA.drawnContents.lines[targetFloor] = data.contents.lines;
+    CANVAS_DATA.drawnContents.stamps[targetFloor] = data.contents.stamps;
+    selectedData.map = data.map;
+    selectedData.floor = data.floor;
+    rewriteMapData(CANVAS_DATA, selectedData.map.mapName);
+    rewriteFloorData(CANVAS_DATA, selectedData.floor);
+    displayCurrentMapName(selectedData.map.mapName);
+    displayCurrentFloorName(selectedData);
+    displayExistedFloors(selectedData);
+    loadMapImage(CANVAS_DATA);
+  } else {
+    CANVAS_DATA.drawnContents = data.contents;
+    selectedData.map = data.map;
+    selectedData.floor = data.floor;
+    rewriteMapData(CANVAS_DATA, selectedData.map.mapName);
+    rewriteFloorData(CANVAS_DATA);
+    displayCurrentMapName(selectedData.map.mapName);
+    displayCurrentFloorName(CANVAS_DATA.selectedData);
+    displayExistedFloors(selectedData);
+    loadMapImage(CANVAS_DATA);
+  }
+
+  updateStaticCanvasCache(CANVAS_DATA);
+  updateCanvas(CANVAS_DATA);
 }

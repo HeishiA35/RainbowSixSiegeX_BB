@@ -3,6 +3,7 @@ import {
   ACTIVE_CLASSNAMES,
   SELECTOR_DATA,
   MODAL_IDS,
+  FORM_ID,
 } from "../data/selector.js";
 import { CANVAS_DATA } from "./canvasManager.js";
 
@@ -54,13 +55,12 @@ export function getOperatorIconFromSelection(sideKey, operatorName) {
   return operatorIcon;
 }
 
-/*****buttons*****/
 /**
- * IDからボタン要素を取得する。
+ * IDオブジェクトから要素を格納した配列を取得する。
  * @param {Object} idObj 
  * @returns {Element[]}
  */
-export function getButtonElementsById(idObj) {
+export function getElementArrayById(idObj) {
   const keyArray = Object.keys(idObj);
   const valueArray = Object.values(idObj);
   const elements = [];
@@ -89,6 +89,20 @@ export function getModalElements(modalId) {
 };
 
 /**
+ * 別の展開ボタンから指定のモーダルを呼び出す。
+ * @param {string} modalId - モーダル読み込むためのID
+ * @param {string} openId - モーダルを開くためのボタンID
+ * @returns {{modal: HTMLElement, open: HTMLElement, close: HTMLElement}}
+ */
+export function externalMoladElementsByOpenId(modalId, openId) {
+  const modal = document.getElementById(`${modalId}`);
+  const open = document.getElementById(`${openId}`);
+  const close = document.getElementById(`${modalId}--close`);
+
+  return{modal, open, close};
+}
+
+/**
  * howToUseで現在開いているページ番号を返す
  * @returns {Number}
  */
@@ -97,6 +111,39 @@ export function getActiveHowToUsePage() {
   const activePageData = activePage.dataset.howToUse;
 
   return activePageData;
+}
+
+/*****spin*****/
+export function getCompass() {
+  const compassContainer = document.getElementById(ELEMENT_IDS.compass);
+  const compassImage = compassContainer.querySelector(SELECTOR_DATA.canvas.compass.image);
+  const topSlot = compassContainer.querySelector(SELECTOR_DATA.canvas.compass.top);
+  const rightSlot = compassContainer.querySelector(SELECTOR_DATA.canvas.compass.right);
+  const bottomSlot = compassContainer.querySelector(SELECTOR_DATA.canvas.compass.bottom);
+  const leftSlot = compassContainer.querySelector(SELECTOR_DATA.canvas.compass.left);
+
+  const compass = {
+    image: compassImage,
+    top: {
+      slot: topSlot,
+      direction: topSlot.textContent,
+    },
+    right: {
+      slot: rightSlot,
+      direction: rightSlot.textContent,
+    },
+    bottom: {
+      slot: bottomSlot,
+      direction: bottomSlot.textContent,
+    },
+    left: {
+      slot: leftSlot,
+      direction: leftSlot.textContent,
+    },
+    allSlots: [topSlot, rightSlot, bottomSlot, leftSlot]
+  }
+  
+  return compass;
 }
 
 /**
@@ -239,4 +286,25 @@ export function initCanvasContext() {
   const staticCanvas = document.createElement('canvas');
   CANVAS_DATA.context.cache.el = staticCanvas,
   CANVAS_DATA.context.cache.ctx = staticCanvas.getContext('2d');
+}
+
+export function getScaleValue() {
+  const minForm = document.getElementById(FORM_ID.zoomScale.min);
+  const minData = new FormData(minForm);
+  const minInt = minData.get('scale-int');
+  const minDec = minData.get('scale-dec');
+  const min = Number(`${minInt}.${minDec}`);
+  
+  const maxForm = document.getElementById(FORM_ID.zoomScale.max);
+  const maxData = new FormData(maxForm);
+  const maxInt = maxData.get('scale-int');
+  const maxDec = maxData.get('scale-dec');
+  const max = maxInt === '8' ? 8 : Number(`${maxInt}.${maxDec}`);
+  
+  const values = {
+    min: min,
+    max: max,
+  }
+
+  return values;
 }
