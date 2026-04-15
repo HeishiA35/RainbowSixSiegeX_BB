@@ -1686,6 +1686,9 @@ z-index memo
 .c-modal__file--area.is-active {
   background: rgba(255, 255, 255, 0.2);
 }
+.c-modal .remarks, .c-modal__confirm .remarks, .c-modal__setting .remarks, .c-modal__penSetting .remarks, .c-modal__eraserSetting .remarks, .c-modal__operatorSetting .remarks, .c-modal__iconSetting .remarks, .c-modal__stamp .remarks, .c-modal__mapSetting .remarks, .c-modal__floorSetting .remarks, .c-modal__file .remarks {
+  font-size: clamp(0.6em, 1.4vw, 1.5em);
+}
 
 .p-hero, .p-hero--board, .p-hero--operators, .p-hero--index {
   background-position: center;
