@@ -1584,6 +1584,10 @@ z-index memo
   justify-content: center;
   align-items: center;
   gap: 2dvh;
+  overflow-y: scroll;
+}
+.c-modal__mapSetting .c-modal__mapTable::-webkit-scrollbar {
+  display: none;
 }
 .c-modal__mapSetting .c-modal__mapTable .c-modal__map {
   width: 100%;

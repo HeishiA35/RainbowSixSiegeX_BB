@@ -660,6 +660,7 @@
 
   &__mapSetting {
     @extend .c-modal;
+
     width: 96dvw;
     height: 96dvh;
     padding: 2dvh 5dvw 2dvh 5dvw;
@@ -684,6 +685,11 @@
       justify-content: center;
       align-items: center;
       gap: 2dvh;
+      overflow-y: scroll;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
 
       .c-modal__map {
         width: 100%;
