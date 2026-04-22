@@ -332,7 +332,7 @@ export const OPERATOR_POOL = {
 
     grim: {
       icon: 'image/icon_operator/attacker/ATK34_grim.png',
-      ability: {img: '', abilityName:'kawanHiveLauncher'},
+      ability: {img: 'image/icon_ability/attacker/grim_kawan_hive_launcher.png', abilityName:'kawanHiveLauncher'},
       gadget1: claymore,
       gadget2: secondaryBreacher,
       gadget3: EMPImpactGranage
