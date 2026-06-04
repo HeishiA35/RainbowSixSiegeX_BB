@@ -62,6 +62,22 @@ export const MAP_POOL = {
     },
   },
 
+  calypsoCasino: {
+    img: 'image/maps/r6-maps-calypsocasino-blueprints/R6S_Maps_CalypsoCasino_Background.avif',
+    rawMap: {
+      basement: 'image/maps/r6-maps-calypsocasino-blueprints/r6-maps-calypsocasino-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-calypsocasino-blueprints/r6-maps-calypsocasino-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-calypsocasino-blueprints/r6-maps-calypsocasino-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-calypsocasino-blueprints/r6-maps-calypsocasino-blueprint-4.jpg'
+    },
+    namedMap: {
+      basement: 'image/maps/r6-maps-calypsocasino-blueprints/named_map/r6-maps-calypsocasino-blueprint-1.jpg',
+      floor1st: 'image/maps/r6-maps-calypsocasino-blueprints/named_map/r6-maps-calypsocasino-blueprint-2.jpg',
+      floor2nd: 'image/maps/r6-maps-calypsocasino-blueprints/named_map/r6-maps-calypsocasino-blueprint-3.jpg',
+      roof: 'image/maps/r6-maps-calypsocasino-blueprints/named_map/r6-maps-calypsocasino-blueprint-4.jpg',
+    },
+  },
+
   chalet: {
     img: 'image/maps/r6-maps-chalet-blueprints/R6S_Maps_Chalet_EXT.jpg',
     rawMap: {

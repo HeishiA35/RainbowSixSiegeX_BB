@@ -218,7 +218,7 @@ export const OPERATOR_POOL = {
 
     dokkaebi: {
       icon: 'image/icon_operator/attacker/ATK19_dokkaebi.png',
-      ability: {img: 'image/icon_ability/attacker/dokkaebi_logic_bomb.png', abilityName:'logicBomb'},
+      ability: {img: 'image/icon_ability/attacker/dokkaebi_Jegeo_payload.png', abilityName:'jegeoPayload'},
       gadget1: smokeGranade,
       gadget2: stunGranade,
       gadget3: EMPImpactGranage
