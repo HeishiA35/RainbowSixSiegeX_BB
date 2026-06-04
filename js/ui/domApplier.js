@@ -92,11 +92,12 @@ export function hideFooter() {
  * 選択済みマップデータをDOMに反映
  */
 export function applySelectedMap() {
-  const mapName = getMapFromSession();
+  const mapNameFromSession = getMapFromSession();
+  const mapName = mapNameFromSession.slice(0, 1).toUpperCase() + mapNameFromSession.slice(1);
   const displayMapElement = document.getElementById(ELEMENT_IDS.selectedMap);
   const displayMapImg = displayMapElement.children[1].children[0];
   const displayMapName = displayMapElement.children[2].children[0];
-  const mapData = getMapDataFromPool(mapName);
+  const mapData = getMapDataFromPool(mapNameFromSession);
 
   displayMapImg.setAttribute('src', mapData.img);
   displayMapImg.setAttribute('alt', mapName);
