@@ -221,7 +221,7 @@ export const OPERATOR_POOL = {
       ability: {img: 'image/icon_ability/attacker/dokkaebi_Jegeo_payload.png', abilityName:'jegeoPayload'},
       gadget1: smokeGranade,
       gadget2: stunGranade,
-      gadget3: EMPImpactGranage
+      gadget3: breachCharge
     },
 
     lion: {
@@ -656,9 +656,16 @@ DEF: {
 
     denari: {
       icon: 'image/icon_operator/difender/DEF38_denari.png',
-      ability: {img: 'image/icon_ability/defender/denari_TRIP_connector.png', abilityName:'T.R.I.P.Connector'},
+      ability: {img: 'image/icon_ability/defender/denari_TRIP_connector.png',abilityName:'T.R.I.P.Connector'},
       gadget1: observationBlocker,
       gadget2: deployableShield
+    },
+
+    noor: {
+      icon: 'image/icon_operator/difender/DEF39_noor.png',
+      ability: {img: 'image/icon_ability/defender/noor_HORUS_lance_launcher.png', abilityName: 'Horus_Lance_Launcher'},
+      gadget1: deployableShield,
+      gadget2: barbedWire,
     }
   }
 }
